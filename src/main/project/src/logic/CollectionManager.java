@@ -39,10 +39,13 @@ public class CollectionManager {
         parser.Parse(input.readFile());
         for (int i = 1; i <= parser.getProductsNum(); i++) {
             Product product = new Product();
-            Initializer.Initialize(product, parser.getValues());
-            freeId = getFreeId();
-            product.setId(freeId);
-            products.add(product);
+            if (Initializer.Initialize(product, parser.getValues())) {
+                freeId = getFreeId();
+                product.setId(freeId);
+                products.add(product);
+            } else {
+                System.out.println("Can not add the element.");
+            }
         }
     }
 
@@ -307,36 +310,38 @@ public class CollectionManager {
 
     public void save() {
         try {
-            Output output = new Output();
-            output.writeLine("<xml -version 8.0>");
-            output.writeLine("<Class>");
-            for (Product product : products) {
-                output.writeLine("  <Product>");
-                output.writeLine("    <Name>" + product.getName() + "<\\Name>");
-                output.writeLine("    <Coordinates>");
-                output.writeLine("      <X>" + product.getCoordinates().getX() + "<\\X>");
-                output.writeLine("      <Y>" + product.getCoordinates().getY() + "<\\Y>");
-                output.writeLine("    <\\Coordinates>");
-                output.writeLine("    <CreationDate>" + product.getCreationDate() + "<\\CreationDate>");
-                output.writeLine("    <Price>" + product.getPrice() + "<\\Price>");
-                output.writeLine("    <partNumber>" + product.getPartNumber() + "<\\partNumber>");
-                output.writeLine("    <UnitOfMeasure>" + product.getUnitOfMeasure() + "<\\UnitOfMeasure>");
-                output.writeLine("    <Person>");
-                output.writeLine("      <Name>" + product.getOwner().getName() + "<\\Name>");
-                output.writeLine("      <Height>" + product.getOwner().getHeight() + "<\\Height>");
-                output.writeLine("      <eyeColor>" + product.getOwner().getEyeColor() + "<\\eyeColor>");
-                output.writeLine("      <Location>");
-                output.writeLine("        <X>" + product.getOwner().getLocation().getX() + "<\\X>");
-                output.writeLine("        <Y>" + product.getOwner().getLocation().getY() + "<\\Y>");
-                output.writeLine("        <Z>" + product.getOwner().getLocation().getZ() + "<\\Z>");
-                output.writeLine("        <Name>" + product.getOwner().getLocation().getName() + "<\\Name>");
-                output.writeLine("      <\\Location>");
-                output.writeLine("    <\\Person>");
-                output.writeLine("  <\\Product>");
+            if (!products.isEmpty()) {
+                Output output = new Output();
+                output.writeLine("<xml -version 8.0>");
+                output.writeLine("<Class>");
+                for (Product product : products) {
+                    output.writeLine("  <Product>");
+                    output.writeLine("    <Name>" + product.getName() + "<\\Name>");
+                    output.writeLine("    <Coordinates>");
+                    output.writeLine("      <X>" + product.getCoordinates().getX() + "<\\X>");
+                    output.writeLine("      <Y>" + product.getCoordinates().getY() + "<\\Y>");
+                    output.writeLine("    <\\Coordinates>");
+                    output.writeLine("    <CreationDate>" + product.getCreationDate() + "<\\CreationDate>");
+                    output.writeLine("    <Price>" + product.getPrice() + "<\\Price>");
+                    output.writeLine("    <partNumber>" + product.getPartNumber() + "<\\partNumber>");
+                    output.writeLine("    <UnitOfMeasure>" + product.getUnitOfMeasure() + "<\\UnitOfMeasure>");
+                    output.writeLine("    <Person>");
+                    output.writeLine("      <Name>" + product.getOwner().getName() + "<\\Name>");
+                    output.writeLine("      <Height>" + product.getOwner().getHeight() + "<\\Height>");
+                    output.writeLine("      <eyeColor>" + product.getOwner().getEyeColor() + "<\\eyeColor>");
+                    output.writeLine("      <Location>");
+                    output.writeLine("        <X>" + product.getOwner().getLocation().getX() + "<\\X>");
+                    output.writeLine("        <Y>" + product.getOwner().getLocation().getY() + "<\\Y>");
+                    output.writeLine("        <Z>" + product.getOwner().getLocation().getZ() + "<\\Z>");
+                    output.writeLine("        <Name>" + product.getOwner().getLocation().getName() + "<\\Name>");
+                    output.writeLine("      <\\Location>");
+                    output.writeLine("    <\\Person>");
+                    output.writeLine("  <\\Product>");
+                }
+                output.writeLine("<\\Class>");
+                output.closeWriter();
+                System.out.println("Saving is successful!");
             }
-            output.writeLine("<\\Class>");
-            output.closeWriter();
-            System.out.println("Saving is successful!");
             modifyHistory("save");
         } catch (IOException ex) {
             System.out.println(ex.getMessage());

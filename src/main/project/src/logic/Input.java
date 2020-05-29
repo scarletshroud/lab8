@@ -21,7 +21,8 @@ public class Input {
 
     public Input() throws FileNotFoundException {
         try {
-            String path = System.getenv("COLLECTION_PATH");
+           // String path = System.getenv("COLLECTION_PATH");
+            String path = "collection.txt";
             reader = new FileReader(path);
             scanner = new Scanner(reader);
         } catch (NullPointerException ex) {

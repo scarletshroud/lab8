@@ -55,7 +55,7 @@ public class Server implements Runnable{
         selector = Selector.open();
 
         serverSocket = ServerSocketChannel.open();
-        serverSocket.bind(new InetSocketAddress(port));
+        serverSocket.bind(new InetSocketAddress("localhost", port));
         serverSocket.configureBlocking(false);
         logger.info("Server is working on:" + serverSocket.getLocalAddress());
 
@@ -85,9 +85,7 @@ public class Server implements Runnable{
                     it.remove();
 
                 }
-            } catch (IOException ex){
-                collectionManager.save();
-            }
+            } catch (IOException ex){}
         }
 
         collectionManager.save();

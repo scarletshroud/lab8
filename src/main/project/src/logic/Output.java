@@ -19,7 +19,8 @@ public class Output {
 
     public Output() throws IOException {
         try {
-            String path = System.getenv().get("COLLECTION_PATH");
+           // String path = System.getenv().get("COLLECTION_PATH");
+            String path = "collection.txt";
             writer = new FileWriter(path);
         } catch(NullPointerException ex) {
             System.err.println("Can not get a path from environment.");

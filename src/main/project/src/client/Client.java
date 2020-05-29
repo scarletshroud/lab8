@@ -39,7 +39,7 @@ public class Client implements Runnable {
     }
 
     public static void main(String[] args) {
-        Client client = new Client("127.0.0.1", 258);
+        Client client = new Client("localhost", 258);
         client.run();
     }
 
@@ -71,7 +71,7 @@ public class Client implements Runnable {
                     }
                 }
             }
-// на выходе из цикла общения закрываем свои ресурсы
+
             oos.close();
             ois.close();
             socket.close();
@@ -115,13 +115,14 @@ public class Client implements Runnable {
     private boolean sendRequest(Packet packet, String userInput) throws IOException {
         try {
             if (packet != null) {
+
                 byte[] message = serializeObject(packet);
                 oos.write(message);
                 oos.flush();
                 logger.info("Client sent message " + userInput + " to server.");
 
                 if (userInput.contains("exit")) {
-                    logger.info("Client stopped work");
+                    logger.info("Client stopped working with server.");
                     return true;
                 }
 

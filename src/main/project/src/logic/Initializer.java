@@ -29,7 +29,7 @@ public class Initializer {
      * @throws ValidationException
      */
 
-    public static void Initialize(Product product, String[] values) throws NullPointerException, ValidationException {
+    public static boolean Initialize(Product product, String[] values) throws NullPointerException, ValidationException {
         try {
             product.setName(values[offset++]);
             Coordinates coordinates = new Coordinates();
@@ -51,12 +51,13 @@ public class Initializer {
             location.setName(values[offset++]);
             person.setLocation(location);
             product.setOwner(person);
-        } catch (NullPointerException ex) {
+        } catch (NullPointerException | NumberFormatException ex) {
             System.err.println("The field can not be null! Check the file.");
+            return false;
         } catch (ValidationException ex) {
             System.err.println(ex.getMessage());
-        } catch (NumberFormatException ex) {
-            System.err.println("The field can not be null! Check the file.");
+            return false;
         }
+        return true;
     }
 }
