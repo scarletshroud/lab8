@@ -1,5 +1,6 @@
 package src.logic;
 
+import src.database.DBManager;
 import src.elements.*;
 
 import javax.xml.bind.ValidationException;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 public class CollectionManager {
     private TreeSet<Product> products;
+    private DBManager dbManager;
     private LocalDateTime creationDate;
     private DefaultQueue history;
     private Scanner scanner;
@@ -30,23 +32,14 @@ public class CollectionManager {
      */
 
     public CollectionManager() throws ValidationException, IOException {
-        Input input = new Input();
-        ParserXML parser = new ParserXML();
+
         products = new TreeSet<>();
         creationDate = LocalDateTime.now();
         history = new DefaultQueue(11);
         scanner = new Scanner(System.in);
-        parser.Parse(input.readFile());
-        for (int i = 1; i <= parser.getProductsNum(); i++) {
-            Product product = new Product();
-            if (Initializer.Initialize(product, parser.getValues())) {
-                freeId = getFreeId();
-                product.setId(freeId);
-                products.add(product);
-            } else {
-                System.out.println("Can not add the element.");
-            }
-        }
+
+        dbManager = new DBManager();
+        products.addAll(dbManager.readAllProducts());
     }
 
     /**
@@ -119,8 +112,6 @@ public class CollectionManager {
 
     public String add(Object object) {
         Product product = (Product) object;
-        freeId = getFreeId();
-        product.setId(freeId);
         products.add(product);
         modifyHistory("add");
         return "Product was successfully added to the collection.";
@@ -167,6 +158,7 @@ public class CollectionManager {
 
     public String clear() {
         products.clear();
+        dbManager.clearProducts();
         modifyHistory("clear");
         return "The collection was cleared.";
     }
@@ -178,15 +170,6 @@ public class CollectionManager {
     public String executeScript() {
         modifyHistory("execute_script");
         return "A new script was started to execute";
-    }
-
-    /**
-     * Stops the app
-     */
-
-    public void finish() {
-        exit = true;
-        scanner.close();
     }
 
     /**

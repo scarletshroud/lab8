@@ -46,7 +46,7 @@ public class Client implements Runnable {
     @Override
     public void run() {
         try {
-            Socket socket = new Socket("localhost", 258);
+            Socket socket = new Socket(host, port);
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             oos = new DataOutputStream(socket.getOutputStream());
             ois = new DataInputStream(socket.getInputStream());
@@ -79,7 +79,8 @@ public class Client implements Runnable {
             System.out.println("Goodbye!");
 
         } catch (IOException | InterruptedException  ex) {
-            ex.printStackTrace();
+            System.out.println("Server is not working. Try to connect later.");
+            logger.info("Unable to connect to server.");
         }
     }
 

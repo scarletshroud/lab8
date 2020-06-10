@@ -81,7 +81,6 @@ public class Person implements Comparable<Person>, Serializable {
         } else {
             eyeColor = Color.BROWN;
         }
-
     }
 
     public void setLocation(Location location) throws NullPointerException {

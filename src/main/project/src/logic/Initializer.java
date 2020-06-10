@@ -2,6 +2,7 @@ package src.logic;
 
 import src.elements.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.xml.bind.ValidationException;
@@ -36,7 +37,7 @@ public class Initializer {
             coordinates.setX(Float.parseFloat(values[offset++]));
             coordinates.setY(Double.parseDouble(values[offset++]));
             product.setCoordinates(coordinates);
-            product.setCreationDate(LocalDateTime.parse(values[offset++]));
+            product.setCreationDate(LocalDate.parse(values[offset++]));
             product.setPrice(Long.parseLong(values[offset++]));
             product.setPartNumber(values[offset++]);
             product.setUnitOfMeasure(values[offset++]);

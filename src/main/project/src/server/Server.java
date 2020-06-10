@@ -1,25 +1,28 @@
 package src.server;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.joran.spi.JoranException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import src.logic.CollectionManager;
 import src.logic.Packet;
 
 import javax.xml.bind.ValidationException;
 import java.io.*;
 import java.net.InetSocketAddress;
+
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+
 import java.util.Iterator;
 import java.util.Set;
+
+import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class Server implements Runnable{
 
@@ -41,55 +44,58 @@ public class Server implements Runnable{
     }
 
     public static void main(String[] args) {
-        Server server = new Server(258);
+        Server server = new Server(29666);
         server.run();
     }
-
-
+    
     public void run() {
         try {
 
-        collectionManager = new CollectionManager();
-        logger.info("Collection was initialized correctly.");
+         //   Connection dbConnection = getDBConnection();
 
-        selector = Selector.open();
+            collectionManager = new CollectionManager();
+            logger.info("Collection was initialized correctly.");
 
-        serverSocket = ServerSocketChannel.open();
-        serverSocket.bind(new InetSocketAddress("localhost", port));
-        serverSocket.configureBlocking(false);
-        logger.info("Server is working on:" + serverSocket.getLocalAddress());
+            selector = Selector.open();
 
-        int ops = serverSocket.validOps();
-        SelectionKey selectionKey = serverSocket.register(selector, ops, null);
+            serverSocket = ServerSocketChannel.open();
+            serverSocket.bind(new InetSocketAddress("localhost", port));
+            serverSocket.configureBlocking(false);
+            logger.info("Server is working on:" + serverSocket.getLocalAddress());
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            int ops = serverSocket.validOps();
+            SelectionKey selectionKey = serverSocket.register(selector, ops, null);
 
-        while (!(reader.ready() && reader.readLine().trim().equals("exit"))) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-            try {
+            while (!(reader.ready() && reader.readLine().trim().equals("exit"))) {
 
-                selector.select();
+                try {
 
-                Set<SelectionKey> selectedKeys = selector.selectedKeys();
-                Iterator<SelectionKey> it = selectedKeys.iterator();
+                    selector.select();
 
-                while (it.hasNext()) {
+                    Set<SelectionKey> selectedKeys = selector.selectedKeys();
+                    Iterator<SelectionKey> it = selectedKeys.iterator();
 
-                    SelectionKey key = it.next();
+                    while (it.hasNext()) {
 
-                    if (key.isAcceptable()) {
-                        acceptConnection(serverSocket, selector);
-                    } else if (key.isReadable()) {
-                        acceptRequest(key);
+                        SelectionKey key = it.next();
+
+                        if (key.isAcceptable()) {
+                            acceptConnection(serverSocket, selector);
+                        } else if (key.isReadable()) {
+                            acceptRequest(key);
+                        }
+                        it.remove();
+
                     }
-                    it.remove();
-
+                } catch (IOException ex) {
+                    System.out.println("Some problems with connection");
                 }
-            } catch (IOException ex){}
-        }
+            }
 
-        collectionManager.save();
-        serverSocket.close();
+            collectionManager.save();
+            serverSocket.close();
 
         } catch (IOException | ValidationException ex) {
             System.out.println(ex.getMessage());

@@ -4,6 +4,7 @@ import com.sun.istack.internal.NotNull;
 
 import javax.xml.bind.ValidationException;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -17,7 +18,7 @@ public class Product implements Comparable<Product>, Serializable {
     @NotNull
     private Coordinates coordinates;
     @NotNull
-    private LocalDateTime creationDate; //Значение этого поля должно генерироваться автоматически
+    private LocalDate creationDate; //Значение этого поля должно генерироваться автоматически
     @NotNull
     private Long price; //Значение поля должно быть больше 0
     @NotNull
@@ -33,7 +34,7 @@ public class Product implements Comparable<Product>, Serializable {
 
     public Product(){
         id = 0;
-        creationDate = LocalDateTime.now();
+        creationDate = LocalDate.now();
     }
 
     /**
@@ -48,8 +49,8 @@ public class Product implements Comparable<Product>, Serializable {
      * @throws ValidationException
      */
 
-    public Product(String name, Coordinates coordinates, Long price, String partNumber, UnitOfMeasure unitOfMeasure, Person owner) throws NullPointerException, ValidationException {
-        if (name == null || name.equals("") || coordinates == null || price == null || partNumber == null || partNumber.equals("") || unitOfMeasure == null || owner == null) {
+    public Product(String name, Coordinates coordinates, LocalDate creationDate, Long price, String partNumber, String unitOfMeasure, Person owner) throws NullPointerException, ValidationException {
+        if (name == null || name.equals("") || creationDate == null || coordinates == null || price == null || partNumber == null || partNumber.equals("") || unitOfMeasure == null || owner == null) {
             throw new NullPointerException();
         }
         if(price <= 0) {
@@ -61,11 +62,19 @@ public class Product implements Comparable<Product>, Serializable {
 
         id = 0;
         this.name = name;
+        this.creationDate = creationDate;
         this.coordinates = coordinates;
-        creationDate = LocalDateTime.now();
         this.price = price;
         this.partNumber = partNumber;
-        this.unitOfMeasure = unitOfMeasure;
+
+        if (unitOfMeasure.equals("PCS")) {
+            this.unitOfMeasure = UnitOfMeasure.PCS;
+        } else if (unitOfMeasure.equals("GRAMS")) {
+            this.unitOfMeasure = UnitOfMeasure.GRAMS;
+        } else if (unitOfMeasure.equals("MILLLITERS")) {
+            this.unitOfMeasure = UnitOfMeasure.MILLILITERS;
+        }
+
         this.owner = owner;
     }
 
@@ -91,7 +100,7 @@ public class Product implements Comparable<Product>, Serializable {
         this.coordinates = coordinates;
     }
 
-    public void setCreationDate(LocalDateTime creationDate) throws NullPointerException {
+    public void setCreationDate(LocalDate creationDate) throws NullPointerException {
         if (creationDate == null) {
             throw new NullPointerException("The creation date can not be empty!");
         }
@@ -141,7 +150,7 @@ public class Product implements Comparable<Product>, Serializable {
     public int getId() {return id;}
     public String getName() {return name;}
     public Coordinates getCoordinates() {return coordinates;}
-    public LocalDateTime getCreationDate() {return creationDate;}
+    public LocalDate getCreationDate() {return creationDate;}
     public Long getPrice() {return price;}
     public String getPartNumber() { return partNumber;}
     public UnitOfMeasure getUnitOfMeasure() {return unitOfMeasure;}
