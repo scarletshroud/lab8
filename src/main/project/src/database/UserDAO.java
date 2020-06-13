@@ -16,13 +16,34 @@ public class UserDAO implements DAO <User, String> {
     }
 
     @Override
-    public void create(@NotNull final User user) {
+    public int create(@NotNull final User user) {
         try (PreparedStatement statement = connection.prepareStatement(sqlQueries.INSERT.QUERY)) {
         statement.setString(1, user.getLogin());
         statement.setString(2, user.getPassword());
         statement.executeQuery();
+        final ResultSet rs = statement.executeQuery();
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+        return -1;
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
+            return -1;
+        }
+    }
+
+    public int create(@NotNull final String login, @NotNull final String pass) {
+        try (PreparedStatement statement = connection.prepareStatement(sqlQueries.INSERT.QUERY)) {
+            statement.setString(1, login);
+            statement.setString(2, pass);
+            final ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return -1;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+            return -1;
         }
     }
 
@@ -58,22 +79,32 @@ public class UserDAO implements DAO <User, String> {
     }
 
     @Override
-    public void delete(@NotNull final User user) {
+    public void delete(@NotNull final int id) {
         try (PreparedStatement statement = connection.prepareStatement(sqlQueries.DELETE.QUERY)) {
-            statement.setInt(1, user.getId());
-            statement.setString(2, user.getLogin());
-            statement.setString(3, user.getPassword());
+            statement.setInt(1, id);
             statement.executeQuery().next();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
     }
 
+    public boolean isAvailable(@NotNull final String login, @NotNull final String pass) {
+        try (PreparedStatement statement = connection.prepareStatement(sqlQueries.GET.QUERY)) {
+            statement.setString(1, login);
+            statement.setString(2, pass);
+            final ResultSet rs = statement.executeQuery();
+            return (rs.next());
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return false;
+    }
+
     enum sqlQueries {
         INSERT("INSERT INTO users (id, login, password) VALUES (DEFAULT, (?), (?)) RETURNING id"),
-        GET("SELECT u.id, u.login, u.password FROM users"),
+        GET("SELECT * FROM users WHERE  login IN (?) AND password IN (?)"),
         UPDATE("UPDATE users SET password = (?) WHERE id = (?) RETURNING id"),
-        DELETE("DELETE FROM users WHERE id = (?) AND login = (?) AND password = (?) RETURNING id");
+        DELETE("DELETE FROM users WHERE id = (?)");
 
         String QUERY;
 

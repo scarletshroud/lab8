@@ -48,11 +48,15 @@ public class DBManager {
         userDAO.create(user);
     }
 
-    public void createProduct(@NotNull final Product product) {
-        productDAO.create(product);
+    public int createUser(@NotNull final String login, @NotNull final String pass) {return userDAO.create(login, pass);}
+
+    public int createProduct(@NotNull final Product product) {
+        return productDAO.create(product);
     }
 
-    public User readUser(@NotNull final String login) {
+    public boolean checkUser(@NotNull final String login, @NotNull final String pass) {return userDAO.isAvailable(login, pass);}
+
+    public User readUser(@NotNull final String login, @NotNull final String pass) {
        return userDAO.read(login);
     }
 
@@ -68,20 +72,14 @@ public class DBManager {
         userDAO.update(user);
     }
 
-    public void updateProduct(@NotNull final Product product) {
-        productDAO.update(product);
+    public void updateProduct(@NotNull final Product product) { productDAO.update(product); }
+
+    public void deleteUser(@NotNull final int id) {
+        userDAO.delete(id);
     }
 
-    public void deleteUser(@NotNull final User user) {
-        userDAO.delete(user);
-    }
-
-    public void deleteProduct(@NotNull final Product product) {
-        productDAO.delete(product);
-    }
-
-    public void clearProducts() {
-        productDAO.clear();
+    public void deleteProduct(@NotNull final int id) {
+        productDAO.delete(id);
     }
 
     public void close() {
@@ -90,6 +88,10 @@ public class DBManager {
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 
 }

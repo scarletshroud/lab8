@@ -21,7 +21,7 @@ public class ProductDAO implements DAO<Product, String> {
     }
 
     @Override
-    public void create(@NotNull final Product product) {
+    public int create(@NotNull final Product product) {
         try(PreparedStatement statement = connection.prepareStatement(sqlQueries.INSERT.QUERY)) {
             statement.setString(1, product.getName());
             statement.setFloat(2, product.getCoordinates().getX());
@@ -37,9 +37,16 @@ public class ProductDAO implements DAO<Product, String> {
             statement.setLong(12, product.getOwner().getLocation().getX());
             statement.setLong(13, product.getOwner().getLocation().getY());
             statement.setInt(14, product.getOwner().getLocation().getZ());
-            statement.executeQuery();
+            statement.setString(15, product.getHost());
+            final ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            } else {
+                return -1;
+            }
         } catch(SQLException ex) {
             System.out.println(ex.getMessage());
+            return -1;
         }
     }
 
@@ -68,6 +75,7 @@ public class ProductDAO implements DAO<Product, String> {
                         new Person(rs.getString("person_name"), rs.getInt("person_height"), rs.getString("person_eyeColor"),
                         new Location(rs.getLong("location_x"), rs.getLong("location_y"), rs.getInt("location_z"), rs.getString("location_name"))));
                 product.setId(rs.getInt("id"));
+                product.setHost(rs.getString("creator"));
                 products.add(product);
                 } catch(ValidationException ex) {
                     System.out.println(ex.getMessage());
@@ -83,10 +91,9 @@ public class ProductDAO implements DAO<Product, String> {
     }
 
     @Override
-    public void delete(@NotNull final Product product) {
+    public void delete(@NotNull final int id) {
         try (PreparedStatement statement = connection.prepareStatement(sqlQueries.DELETE.QUERY)) {
-            statement.setInt(1, product.getId());
-            statement.setString(2, product.getName());
+            statement.setInt(1, id);
             statement.executeQuery().next();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
@@ -96,7 +103,8 @@ public class ProductDAO implements DAO<Product, String> {
     @Override
     public void update(@NotNull final Product product) {
         try (PreparedStatement statement = connection.prepareStatement(sqlQueries.UPDATE.QUERY)) {
-            statement.setString(1, product.getName());
+            statement.setInt(1, product.getId());
+            statement.setString(2, product.getName());
             statement.executeQuery().next();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
@@ -104,21 +112,12 @@ public class ProductDAO implements DAO<Product, String> {
         }
     }
 
-    public void clear() {
-        try (PreparedStatement statement = connection.prepareStatement(sqlQueries.CLEAR.QUERY)) {
-            statement.executeQuery();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-    }
-
     enum sqlQueries {
-        INSERT("INSERT INTO products (id, name, coordinate_x, coordinate_y, creation_date, price, part_number, unit_of_measure, person_name, person_height, person_eyeColor, location_name, location_x, location_y, location_z) VALUES (DEFAULT, (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?)) RETURNING id"),
-        GET("SELECT p.id, p.name, p.coordinate_x, p.coordinate_y, p.creation_date, p.price, p.part_number, p.unit_of_measure, p.person_name, p.person_height, p.person_eyeColor, p.location_name, p.location_x, p.location_y, p.location_z FROM products"),
-        UPDATE("UPDATE products SET id = (DEFAULT) WHERE name = (?) RETURNING id"),
-        DELETE("DELETE FROM products WHERE id = (?) AND name = (?) RETURNING id"),
-        GET_ALL("SELECT * FROM products"),
-        CLEAR("TRUNCATE TABLE products");
+        INSERT("INSERT INTO products (id, name, coordinate_x, coordinate_y, creation_date, price, part_number, unit_of_measure, person_name, person_height, person_eyeColor, location_name, location_x, location_y, location_z, creator) VALUES (DEFAULT, (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?)) RETURNING id"),
+        GET("SELECT p.id, p.name, p.coordinate_x, p.coordinate_y, p.creation_date, p.price, p.part_number, p.unit_of_measure, p.person_name, p.person_height, p.person_eyeColor, p.location_name, p.location_x, p.location_y, p.location_z, host FROM products"),
+        UPDATE("UPDATE products SET id IN(?) WHERE name IN(?)"),
+        DELETE("DELETE FROM products WHERE id  IN(?)"),
+        GET_ALL("SELECT * FROM products");
 
         String QUERY;
 

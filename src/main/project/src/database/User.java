@@ -2,15 +2,17 @@ package src.database;
 
 import com.sun.istack.internal.NotNull;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
 
     private int id;
     private String login;
     private String password;
 
-    User() {}
+    public User() {}
 
-    User(@NotNull final String login, @NotNull final String password) {
+    public User(@NotNull final String login, @NotNull final String password) {
         this.login = login;
         this.password = password;
     }
