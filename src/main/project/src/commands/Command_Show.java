@@ -1,7 +1,7 @@
 package src.commands;
 
-import src.client.Client;
-import src.logic.CollectionManager;
+import src.database.User;
+import src.server.Server;
 
 import java.io.Serializable;
 
@@ -25,12 +25,15 @@ public class Command_Show extends Command implements Serializable {
 
     /**
      * Execute method Show in Collection Manager.
-     * @param collectionManager -the manager of collection
+     * @param server -the manager of collection
      */
 
     @Override
-    public String executeOnServer(CollectionManager collectionManager, Object object) {
-            return collectionManager.show();
+    public String executeOnServer(Server server, User user, Object object) {
+        if (server.checkUser(user.getLogin(), user.getPassword())) {
+            return server.getCollectionManager().show();
+        }
+        return "You don't have rights to interact with collection!";
     }
 
 }

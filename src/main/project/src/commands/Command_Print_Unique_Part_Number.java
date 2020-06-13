@@ -1,7 +1,9 @@
 package src.commands;
 
 import src.client.Client;
+import src.database.User;
 import src.logic.CollectionManager;
+import src.server.Server;
 
 import java.io.Serializable;
 
@@ -25,11 +27,14 @@ public class Command_Print_Unique_Part_Number extends Command implements Seriali
 
     /**
      * Execute method Print Unique Part Number in Collection Manager.
-     * @param collectionManager -the manager of collection
+     * @param server -the manager of collection
      */
 
     @Override
-    public String executeOnServer(CollectionManager collectionManager, Object object) {
-        return collectionManager.printUniquePartNumber();
+    public String executeOnServer(Server server, User user, Object object) {
+        if (server.checkUser(user.getLogin(), user.getPassword())) {
+            return server.getCollectionManager().printUniquePartNumber();
+        }
+        return "You don't have rights to interact with collection!";
     }
 }

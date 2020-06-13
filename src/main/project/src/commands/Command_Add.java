@@ -1,16 +1,17 @@
 package src.commands;
 
 import src.client.Client;
+import src.database.User;
 import src.elements.Coordinates;
 import src.elements.Location;
 import src.elements.Person;
 import src.elements.Product;
-import src.logic.CollectionManager;
 import src.logic.Packet;
+import src.server.Server;
 
 import javax.xml.bind.ValidationException;
-import java.io.IOException;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Scanner;
 
 /**
@@ -34,27 +35,34 @@ public class Command_Add extends Command implements Serializable {
 
     /**
      * Execute method add in Collection Manager.
-     * @param collectionManager - the manager of collection
+     * @param server - the manager of collection
      */
 
     @Override
-    public String executeOnServer(CollectionManager collectionManager, Object object)  {
-            return collectionManager.add(object);
+    public String executeOnServer(Server server, User user, Object object)  {
+            if (server.checkUser(user.getLogin(), user.getPassword())) {
+                return server.getCollectionManager().add(object);
+            }
+            return "You don't have rights to interact with collection!";
     }
 
     @Override
-    public Packet executeOnClient(String ... args) {
-        Product product = new Product();
-        if (readElement(product, args[0])) {
-            System.out.println("Ready to add element to collection!");
-            return new Packet(this, product);
-        } else {
-            System.out.println("Some problems with adding a product.");
-            return null;
+    public Packet executeOnClient(boolean authorized, User user, String ... args) {
+        if (authorized) {
+            Product product = new Product();
+            if (readElement(product, user, args[0])) {
+                System.out.println("Ready to add element to collection!");
+                return new Packet(this, user, product);
+            } else {
+                System.out.println("Some problems with adding a product.");
+                return null;
+            }
         }
+        System.out.println("You must be logged in to continue working.");
+        return null;
     }
 
-    private boolean readElement(Product product, String name) {
+    private boolean readElement(Product product, User user, String name) {
         boolean success = true;
         Coordinates coordinates = new Coordinates();
         Location location = new Location();
@@ -62,6 +70,9 @@ public class Command_Add extends Command implements Serializable {
         Scanner scanner = new Scanner(System.in);
         String nextValue = new String();
         product.setName(name);
+        product.setHost(user.getLogin());
+        LocalDate creationDate = LocalDate.now();
+        product.setCreationDate(creationDate);
 
         try {
             System.out.println("Enter the coordinate x of coordinates");

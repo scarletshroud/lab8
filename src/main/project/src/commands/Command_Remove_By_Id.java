@@ -1,8 +1,10 @@
 package src.commands;
 
 import src.client.Client;
+import src.database.User;
 import src.logic.CollectionManager;
 import src.logic.Packet;
+import src.server.Server;
 
 import java.io.Serializable;
 
@@ -26,17 +28,24 @@ public class Command_Remove_By_Id extends Command implements Serializable {
 
     /**
      * Execute method Remove By Id in Collection Manager.
-     * @param collectionManager -the manager of collection
+     * @param server -the manager of collection
      */
 
     @Override
-    public String executeOnServer(CollectionManager collectionManager, Object object) {
-        return collectionManager.removeById(object);
+    public String executeOnServer(Server server, User user, Object object) {
+        if (server.checkUser(user.getLogin(), user.getPassword())) {
+            return server.getCollectionManager().removeById(user, object);
+        }
+        return "You don't have rights to interact with collection!";
     }
 
     @Override
-    public Packet executeOnClient(String ... args) {
-        Integer id = Integer.parseInt(args[0]);
-        return new Packet(this, id);
+    public Packet executeOnClient(boolean authorized, User user, String ... args) {
+        if (authorized) {
+            Integer id = Integer.parseInt(args[0]);
+            return new Packet(this, user, id);
+        }
+        System.out.println("You must be logged in to continue working.");
+        return null;
     }
 }
