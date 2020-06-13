@@ -1,19 +1,18 @@
 package src.client;
 
+import com.sun.istack.internal.NotNull;
 import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import src.database.User;
 import src.exceptions.InvalidCommand;
 import src.logic.CommandHandler;
 import src.commands.*;
 import src.logic.Packet;
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class Client implements Runnable {
@@ -25,8 +24,10 @@ public class Client implements Runnable {
     private final String host;
     private final int port;
     private final int BUFFER_SIZE = 4096;
+    private boolean authorized;
 
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
+    private static User user;
 
     public Client(String host, int port) {
         this.host = host;
@@ -35,11 +36,14 @@ public class Client implements Runnable {
         ois = null;
         oos = null;
 
+        authorized = false;
+
         commandHandler = new CommandHandler();
+        user = new User();
     }
 
     public static void main(String[] args) {
-        Client client = new Client("localhost", 258);
+        Client client = new Client("localhost", 29666);
         client.run();
     }
 
@@ -55,13 +59,15 @@ public class Client implements Runnable {
             logger.info("Client writing channel = oos & reading channel = ois initialized.");
 
             System.out.println("Hello, you are connected to server.");
+            System.out.println("Firstly, you should to login or register. (enter \"login\" or \"register\")");
 
             boolean close = false;
+
             registerCommands();
 
             while(!socket.isOutputShutdown()) {
 
-                if(br.ready()){
+                if (br.ready()) {
                     logger.info("Client started writing a message to server...");
                     String userInput = br.readLine();
                     close = handleRequest(userInput);
@@ -87,26 +93,32 @@ public class Client implements Runnable {
     private boolean handleRequest(String userInput) throws IOException, InterruptedException{
 
         try {
-            Boolean close = false;
 
             Command command = commandHandler.pickCommand(userInput);
 
             if (command != null) {
+
                 String[] args = createArgs(userInput);
+
+                if (userInput.contains("exit")) {
+                    logger.info("Client stopped working with server.");
+                    return true;
+                }
 
                 if (userInput.contains("execute_script")) {
                     Command_Execute_Script com = (Command_Execute_Script) command;
-                    ArrayList<Packet> packets = com.execute(userInput);
+                    ArrayList<Packet> packets = com.execute(authorized, user, userInput);
                     if (packets != null) {
                         for (Packet p : packets) {
                             sendRequest(p, userInput);
                         }
                     }
                 } else {
-                    Packet packet = command.executeOnClient(args);
+                    Packet packet = command.executeOnClient(authorized, user, args);
                     return sendRequest(packet, userInput);
                 }
             }
+
         } catch (InvalidCommand ex) {
             System.out.println(ex.getMessage());
         }
@@ -115,6 +127,7 @@ public class Client implements Runnable {
 
     private boolean sendRequest(Packet packet, String userInput) throws IOException {
         try {
+
             if (packet != null) {
 
                 byte[] message = serializeObject(packet);
@@ -122,14 +135,7 @@ public class Client implements Runnable {
                 oos.flush();
                 logger.info("Client sent message " + userInput + " to server.");
 
-                if (userInput.contains("exit")) {
-                    logger.info("Client stopped working with server.");
-                    return true;
-                }
-
                 logger.info("Client sent message & start waiting for data from server...");
-                System.out.println("Sending data...");
-                System.out.print("Waiting for the answer from server");
 
                 while (ois.available() <= 0) {
                 }
@@ -138,6 +144,9 @@ public class Client implements Runnable {
                 byte[] bytes = new byte[BUFFER_SIZE];
                 ois.read(bytes);
                 String input = new String(bytes);
+                if (input.contains("Authorization is successful!")) {
+                    authorized = true;
+                }
                 System.out.println(input);
             }
         } catch (SocketException ex) {
@@ -159,7 +168,7 @@ public class Client implements Runnable {
         return byteArrayOutputStream.toByteArray();
     }
 
-    private String[] createArgs(String input) {
+    private String[] createArgs(@NotNull String input) {
         String[] args = input.split(" ");
         String[] argsToSend = new String[args.length-1];
         System.arraycopy(args, 1, argsToSend, 0, args.length-1);
@@ -167,6 +176,8 @@ public class Client implements Runnable {
     }
 
     private void registerCommands() {
+        commandHandler.register("login", new Command_Login());
+        commandHandler.register("register", new Command_Register());
         commandHandler.register("help", new Command_Help());
         commandHandler.register("info", new Command_Info());
         commandHandler.register("show", new Command_Show());

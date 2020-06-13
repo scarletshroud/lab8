@@ -27,6 +27,8 @@ public class Product implements Comparable<Product>, Serializable {
     private UnitOfMeasure unitOfMeasure;
     @NotNull
     private Person owner;
+    @NotNull
+    private String host;
 
     /**
      * Constructor
@@ -71,7 +73,7 @@ public class Product implements Comparable<Product>, Serializable {
             this.unitOfMeasure = UnitOfMeasure.PCS;
         } else if (unitOfMeasure.equals("GRAMS")) {
             this.unitOfMeasure = UnitOfMeasure.GRAMS;
-        } else if (unitOfMeasure.equals("MILLLITERS")) {
+        } else if (unitOfMeasure.equals("MILLILITERS")) {
             this.unitOfMeasure = UnitOfMeasure.MILLILITERS;
         }
 
@@ -147,6 +149,13 @@ public class Product implements Comparable<Product>, Serializable {
         this.owner = owner;
     }
 
+    public void setHost(String name) throws NumberFormatException {
+        if(name == null) {
+            throw new NullPointerException("The variable host is null!");
+        }
+        this.host = name;
+    }
+
     public int getId() {return id;}
     public String getName() {return name;}
     public Coordinates getCoordinates() {return coordinates;}
@@ -155,6 +164,7 @@ public class Product implements Comparable<Product>, Serializable {
     public String getPartNumber() { return partNumber;}
     public UnitOfMeasure getUnitOfMeasure() {return unitOfMeasure;}
     public Person getOwner() {return owner;}
+    public String getHost() {return host;}
 
     /**
      * Method which compares coordinates with each other.
@@ -177,6 +187,6 @@ public class Product implements Comparable<Product>, Serializable {
     public String toString() {
         return "Product [Id = " + id +  ", Name = " + name + " coordinates = " + coordinates
                 + ", creationDate = " + creationDate  + ", price = " + price
-                + ", partNumber = " + partNumber + ", unitOfMeasure = " + unitOfMeasure + ", owner =  " + owner + "] ";
+                + ", partNumber = " + partNumber + ", unitOfMeasure = " + unitOfMeasure + ", owner =  " + owner + ", host = " + host +"] ";
     }
 }

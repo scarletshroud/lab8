@@ -1,12 +1,14 @@
 package src.logic;
 
 import src.database.DBManager;
+import src.database.User;
 import src.elements.*;
 
 import javax.xml.bind.ValidationException;
 import java.io.IOException;
 
 import java.lang.reflect.Field;
+import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,14 +33,13 @@ public class CollectionManager {
      * @throws IOException
      */
 
-    public CollectionManager() throws ValidationException, IOException {
+    public CollectionManager(DBManager dbManager) throws ValidationException, IOException {
 
         products = new TreeSet<>();
         creationDate = LocalDateTime.now();
         history = new DefaultQueue(11);
         scanner = new Scanner(System.in);
-
-        dbManager = new DBManager();
+        this.dbManager = dbManager;
         products.addAll(dbManager.readAllProducts());
     }
 
@@ -112,9 +113,15 @@ public class CollectionManager {
 
     public String add(Object object) {
         Product product = (Product) object;
-        products.add(product);
         modifyHistory("add");
-        return "Product was successfully added to the collection.";
+        int id = dbManager.createProduct(product);
+        if (id  != -1) {
+            product.setId(id);
+            products.add(product);
+            return "Product was successfully added to the collection.";
+        } else {
+            return "There are some problems with adding a product to collection.";
+        }
     }
 
     /**
@@ -124,12 +131,15 @@ public class CollectionManager {
 
     public String addIfMax(Object object) {
         Product product = (Product) object;
-        freeId = getFreeId();
-        product.setId(freeId);
         modifyHistory("add_if_max");
         if (product.getPrice() > findMax()) {
-            products.add(product);
-            return "Product was successfully added to the collection.";
+            int id = dbManager.createProduct(product);
+            if (id != -1) {
+                products.add(product);
+                return "Product was successfully added to the collection.";
+            } else {
+                return "There are some problems with adding a product to collection.";
+            }
         } else {
             return "You are trying to add the product which isn't a max!";
         }
@@ -141,24 +151,32 @@ public class CollectionManager {
 
     public String addIfMin(Object object) {
         Product product = (Product) object;
-        freeId = getFreeId();
-        product.setId(freeId);
         modifyHistory("add_if_min");
         if (product.getPrice() < findMin()) {
+            int id = dbManager.createProduct(product);
+            if (id != -1) {
                 products.add(product);
-            return "Product was successfully added to the collection.";
-        } else {
-            return "You are trying to add the product which isn't a min!";
+                return "Product was successfully added to the collection.";
+            } else {
+                return "There are some problems with adding a product to collection.";
+            }
         }
+        return "You are trying to add the product which isn't a min!";
     }
 
     /**
      * Clears collection
      */
 
-    public String clear() {
-        products.clear();
-        dbManager.clearProducts();
+    public String clear(User user) {
+
+        for (Product p : products) {
+            if (p.getHost().equals(user.getLogin())) {
+                products.remove(p);
+                dbManager.deleteProduct(p.getId());
+            }
+        }
+
         modifyHistory("clear");
         return "The collection was cleared.";
     }
@@ -276,59 +294,24 @@ public class CollectionManager {
      * Removes an element by id
      */
 
-    public String removeById(Object object) {
+    public String removeById(User user, Object object) {
         Integer id = (Integer) object;
-        products = products.stream()
-                .filter(Product->Product.getId() != id)
-                .collect(Collectors.toCollection(TreeSet::new));
 
         modifyHistory("remove_by_id");
-        return "Element was successfully removed.";
-    }
 
-    /**
-     * Saves collection to file
-     * @throws IOException
-     */
-
-    public void save() {
-        try {
-            if (!products.isEmpty()) {
-                Output output = new Output();
-                output.writeLine("<xml -version 8.0>");
-                output.writeLine("<Class>");
-                for (Product product : products) {
-                    output.writeLine("  <Product>");
-                    output.writeLine("    <Name>" + product.getName() + "<\\Name>");
-                    output.writeLine("    <Coordinates>");
-                    output.writeLine("      <X>" + product.getCoordinates().getX() + "<\\X>");
-                    output.writeLine("      <Y>" + product.getCoordinates().getY() + "<\\Y>");
-                    output.writeLine("    <\\Coordinates>");
-                    output.writeLine("    <CreationDate>" + product.getCreationDate() + "<\\CreationDate>");
-                    output.writeLine("    <Price>" + product.getPrice() + "<\\Price>");
-                    output.writeLine("    <partNumber>" + product.getPartNumber() + "<\\partNumber>");
-                    output.writeLine("    <UnitOfMeasure>" + product.getUnitOfMeasure() + "<\\UnitOfMeasure>");
-                    output.writeLine("    <Person>");
-                    output.writeLine("      <Name>" + product.getOwner().getName() + "<\\Name>");
-                    output.writeLine("      <Height>" + product.getOwner().getHeight() + "<\\Height>");
-                    output.writeLine("      <eyeColor>" + product.getOwner().getEyeColor() + "<\\eyeColor>");
-                    output.writeLine("      <Location>");
-                    output.writeLine("        <X>" + product.getOwner().getLocation().getX() + "<\\X>");
-                    output.writeLine("        <Y>" + product.getOwner().getLocation().getY() + "<\\Y>");
-                    output.writeLine("        <Z>" + product.getOwner().getLocation().getZ() + "<\\Z>");
-                    output.writeLine("        <Name>" + product.getOwner().getLocation().getName() + "<\\Name>");
-                    output.writeLine("      <\\Location>");
-                    output.writeLine("    <\\Person>");
-                    output.writeLine("  <\\Product>");
+        for (Product p : products) {
+            if (p.getId() == id) {
+                if (p.getHost().equals(user.getLogin())) {
+                    products.remove(p);
+                    dbManager.deleteProduct(id);
+                    return "Element was successfully removed.";
                 }
-                output.writeLine("<\\Class>");
-                output.closeWriter();
-                System.out.println("Saving is successful!");
+                else {
+                    return "You don't have a permission to change this element!";
+                }
             }
-            modifyHistory("save");
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
         }
+        return "The element with this id wasn't found.";
     }
 
     /**
@@ -337,11 +320,17 @@ public class CollectionManager {
 
     public String show() {
         String result = new String();
-        for(Product p : products){
-            result += p.toString() + "\n";
-        }
+
         modifyHistory("show");
-        return result;
+
+        if (!products.isEmpty()) {
+            for (Product p : products) {
+                result += p.toString() + "\n";
+            }
+            return result;
+        }
+
+        return "Collection is empty.";
     }
 
     /**
@@ -368,21 +357,32 @@ public class CollectionManager {
      * Updates id of element
      */
 
-    public String updateId(Object object) {
+    public String updateId(User user, Object object) {
         Object[] objects = (Object[]) object;
         Integer id = (Integer) objects[0];
         String name = (String) objects[1];
 
-        if (isIdBusy(id)) {
-         return "Impossible to update the id. This id is already used.";
-        } else {
-            products.stream()
-                    .filter(p -> p.getName().equals(name))
-                    .forEach((p) -> p.setId(id));
+        modifyHistory("update_id");
 
-            modifyHistory("update_id");
-            return "The id of the element was successfully updated.";
+        for (Product p : products) {
+            if (p.getName().equals(name) &&  !isIdBusy(id)) {
+                if (p.getHost().equals(user.getLogin())) {
+                    p.setId(id);
+
+                    Product product = new Product();
+                    product.setId(id);
+                    product.setName(name);
+
+                    dbManager.updateProduct(product);
+
+                    return "The element's id was successfully updated!";
+                }
+                return "You don't have a permission to change this element!";
+            }
         }
+
+        return "This id is busy.";
+
     }
 
     public boolean getExit() {

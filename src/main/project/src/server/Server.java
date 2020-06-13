@@ -1,8 +1,11 @@
 package src.server;
 
+import com.sun.istack.internal.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import src.database.DBManager;
+import src.database.User;
 import src.logic.CollectionManager;
 import src.logic.Packet;
 
@@ -26,12 +29,15 @@ import java.sql.SQLException;
 
 public class Server implements Runnable{
 
+    public static Server server;
+
     private final int port;
     private final int BUFFER_SIZE = 4096;
 
     private ServerSocketChannel serverSocket;
     private Selector selector;
     private CollectionManager collectionManager;
+    private DBManager dbManager;
 
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
@@ -39,6 +45,7 @@ public class Server implements Runnable{
 
 
     public Server(int port) {
+        server = this;
         this.port = port;
         isWorking = true;
     }
@@ -53,7 +60,9 @@ public class Server implements Runnable{
 
          //   Connection dbConnection = getDBConnection();
 
-            collectionManager = new CollectionManager();
+            dbManager = new DBManager();
+
+            collectionManager = new CollectionManager(dbManager);
             logger.info("Collection was initialized correctly.");
 
             selector = Selector.open();
@@ -94,7 +103,7 @@ public class Server implements Runnable{
                 }
             }
 
-            collectionManager.save();
+            dbManager.close();
             serverSocket.close();
 
         } catch (IOException | ValidationException ex) {
@@ -121,7 +130,7 @@ public class Server implements Runnable{
             byte[] bytes = buffer.array();
             Packet packet = deserialize(bytes);
             if (packet != null) {
-                String answer = packet.getCommand().executeOnServer(collectionManager, packet.getArgument());
+                String answer = packet.getCommand().executeOnServer(this, packet.getUser(), packet.getArgument());
 
                 if (answer != null) {
                     buffer.clear();
@@ -146,4 +155,15 @@ public class Server implements Runnable{
         return null;
    }
 
+   public CollectionManager getCollectionManager() {
+        return collectionManager;
+   }
+
+   public boolean checkUser(@NotNull final String login, @NotNull final String pass) {
+       return dbManager.checkUser(login, pass);
+   }
+
+   public int registerUser(@NotNull final String login, @NotNull final String pass) {
+        return dbManager.createUser(login, pass);
+    }
 }
