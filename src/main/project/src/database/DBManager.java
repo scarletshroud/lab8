@@ -12,7 +12,7 @@ public class DBManager {
 
     private String DB_URL = "jdbc:postgresql://127.0.0.1:5432/lab7";
     private String USER = "postgres";
-    private String PASS = "B7OQdoHH";
+    private String PASS = "s123123";
     private Connection connection;
     private ProductDAO productDAO;
     private UserDAO userDAO;
