@@ -1,5 +1,7 @@
 package src.commands;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import src.client.Client;
 import src.database.User;
 import src.exceptions.BadNumberOfArgsException;
@@ -19,6 +21,8 @@ public class Command_Help extends Command implements Serializable {
      * Constructor
      */
 
+    private static final Logger logger = LoggerFactory.getLogger(Server.class);
+
     public Command_Help() { }
 
     @Override
@@ -33,6 +37,7 @@ public class Command_Help extends Command implements Serializable {
 
     @Override
     public String executeOnServer(Server server, User user, Object object) {
+        logger.info("executeCommand");
         if (server.checkUser(user.getLogin(), user.getPassword())) {
             return server.getCollectionManager().help();
         }

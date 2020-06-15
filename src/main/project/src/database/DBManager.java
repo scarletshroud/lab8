@@ -1,7 +1,10 @@
 package src.database;
 
 import com.sun.istack.internal.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import src.elements.Product;
+import src.server.Server;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,6 +13,8 @@ import java.util.ArrayList;
 
 public class DBManager {
 
+
+    private static final Logger logger = LoggerFactory.getLogger(Server.class);
     private String DB_URL = "jdbc:postgresql://127.0.0.1:5432/lab7";
     private String USER = "postgres";
     private String PASS = "s123123";
@@ -54,7 +59,7 @@ public class DBManager {
         return productDAO.create(product);
     }
 
-    public boolean checkUser(@NotNull final String login, @NotNull final String pass) {return userDAO.isAvailable(login, pass);}
+    public boolean checkUser(@NotNull final String login, @NotNull final String pass) {logger.info("checkUser"); return userDAO.isAvailable(login, pass);}
 
     public User readUser(@NotNull final String login, @NotNull final String pass) {
        return userDAO.read(login);

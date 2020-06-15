@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 
 public class Reader implements Runnable {
@@ -27,29 +26,36 @@ public class Reader implements Runnable {
 
         try {
 
-            ExecutorService executorService = Executors.newCachedThreadPool();
-            ForkJoinPool pool = new ForkJoinPool(1);
-
             logger.info("Server started accepting the new request.");
 
             ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
-            socket.read(buffer);
-            if (buffer.position() > 0) {
-                byte[] bytes = buffer.array();
-                Packet packet = deserialize(bytes);
-                if (packet != null) {
-                   Future<String> result = pool.submit(new Handler(packet));
-                   try {
-                       String answer = result.get();
-                       if (answer != null) {
-                           executorService.submit(new Sender(socket, answer, buffer, bytes));
-                       }
-                       executorService.shutdown();
-                   } catch(InterruptedException | ExecutionException ex) {
-                       ex.printStackTrace();
-                   }
+
+            ExecutorService senderExecutor = Executors.newCachedThreadPool();
+            ForkJoinPool handlerPool = new ForkJoinPool(1);
+
+            while(socket.isConnected()) {
+                socket.read(buffer);
+                if (buffer.position() > 0) {
+                    byte[] bytes = buffer.array();
+                    Packet packet = deserialize(bytes);
+                    if (packet != null) {
+                        Handler handler = new Handler(packet);
+                        Future<String> result = handlerPool.submit(handler);
+                        try {
+                            String answer = result.get(30, TimeUnit.SECONDS);
+                            Sender sender = new Sender(socket, answer);
+                            senderExecutor.submit(sender);
+                        } catch (InterruptedException | ExecutionException | TimeoutException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                    buffer.clear();
                 }
             }
+
+            senderExecutor.shutdown();
+            handlerPool.shutdown();
+
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
             logger.info(ex.getMessage());

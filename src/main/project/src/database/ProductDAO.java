@@ -21,7 +21,7 @@ public class ProductDAO implements DAO<Product, String> {
     }
 
     @Override
-    public int create(@NotNull final Product product) {
+    synchronized public int create(@NotNull final Product product) {
         try(PreparedStatement statement = connection.prepareStatement(sqlQueries.INSERT.QUERY)) {
             statement.setString(1, product.getName());
             statement.setFloat(2, product.getCoordinates().getX());
@@ -51,7 +51,7 @@ public class ProductDAO implements DAO<Product, String> {
     }
 
     @Override
-    public Product read(@NotNull final String name) {
+    synchronized public Product read(@NotNull final String name) {
         Product product = new Product();
         try(PreparedStatement statement = connection.prepareStatement(sqlQueries.GET.QUERY)) {
             statement.setString(1, name);
@@ -61,7 +61,7 @@ public class ProductDAO implements DAO<Product, String> {
         return product;
     }
 
-    public ArrayList<Product> readAll() {
+    synchronized public ArrayList<Product> readAll() {
         ArrayList<Product> products = new ArrayList<>();
 
         try(PreparedStatement statement = connection.prepareStatement(sqlQueries.GET_ALL.QUERY)) {
@@ -91,7 +91,7 @@ public class ProductDAO implements DAO<Product, String> {
     }
 
     @Override
-    public void delete(@NotNull final int id) {
+    synchronized public void delete(@NotNull final int id) {
         try (PreparedStatement statement = connection.prepareStatement(sqlQueries.DELETE.QUERY)) {
             statement.setInt(1, id);
             statement.executeQuery().next();
@@ -101,7 +101,7 @@ public class ProductDAO implements DAO<Product, String> {
     }
 
     @Override
-    public void update(@NotNull final Product product) {
+    synchronized public void update(@NotNull final Product product) {
         try (PreparedStatement statement = connection.prepareStatement(sqlQueries.UPDATE.QUERY)) {
             statement.setInt(1, product.getId());
             statement.setString(2, product.getName());

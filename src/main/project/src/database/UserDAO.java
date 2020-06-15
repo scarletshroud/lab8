@@ -1,6 +1,9 @@
 package src.database;
 
 import com.sun.istack.internal.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import src.server.Server;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,6 +12,7 @@ import java.sql.SQLException;
 
 public class UserDAO implements DAO <User, String> {
 
+    private static final Logger logger = LoggerFactory.getLogger(Server.class);
     private Connection connection;
 
     UserDAO(final Connection connection) {
@@ -16,7 +20,7 @@ public class UserDAO implements DAO <User, String> {
     }
 
     @Override
-    public int create(@NotNull final User user) {
+    synchronized public int create(@NotNull final User user) {
         try (PreparedStatement statement = connection.prepareStatement(sqlQueries.INSERT.QUERY)) {
         statement.setString(1, user.getLogin());
         statement.setString(2, user.getPassword());
@@ -32,7 +36,7 @@ public class UserDAO implements DAO <User, String> {
         }
     }
 
-    public int create(@NotNull final String login, @NotNull final String pass) {
+    synchronized public int create(@NotNull final String login, @NotNull final String pass) {
         try (PreparedStatement statement = connection.prepareStatement(sqlQueries.INSERT.QUERY)) {
             statement.setString(1, login);
             statement.setString(2, pass);
@@ -48,7 +52,7 @@ public class UserDAO implements DAO <User, String> {
     }
 
     @Override
-    public User read(@NotNull final String login) {
+    synchronized public User read(@NotNull final String login) {
         User user = new User();
         user.setId(-1);
 
@@ -68,7 +72,7 @@ public class UserDAO implements DAO <User, String> {
     }
 
     @Override
-    public void update(@NotNull final User user) {
+    synchronized public void update(@NotNull final User user) {
         try(PreparedStatement statement = connection.prepareStatement(sqlQueries.UPDATE.QUERY)) {
             statement.setString(1, user.getPassword());
             statement.setInt(2, user.getId());
@@ -79,7 +83,7 @@ public class UserDAO implements DAO <User, String> {
     }
 
     @Override
-    public void delete(@NotNull final int id) {
+    synchronized public void delete(@NotNull final int id) {
         try (PreparedStatement statement = connection.prepareStatement(sqlQueries.DELETE.QUERY)) {
             statement.setInt(1, id);
             statement.executeQuery().next();
@@ -88,7 +92,8 @@ public class UserDAO implements DAO <User, String> {
         }
     }
 
-    public boolean isAvailable(@NotNull final String login, @NotNull final String pass) {
+    synchronized public boolean isAvailable(@NotNull final String login, @NotNull final String pass) {
+        logger.info("isAvailable");
         try (PreparedStatement statement = connection.prepareStatement(sqlQueries.GET.QUERY)) {
             statement.setString(1, login);
             statement.setString(2, pass);

@@ -32,7 +32,7 @@ public class Command_Clear extends Command implements Serializable {
      */
 
     @Override
-    public String executeOnServer(Server server, User user, Object object) {
+    synchronized public String executeOnServer(Server server, User user, Object object) {
         if (server.checkUser(user.getLogin(), user.getPassword())) {
             return server.getCollectionManager().clear(user);
         }

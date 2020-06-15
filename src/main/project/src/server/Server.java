@@ -15,6 +15,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 
 
 public class Server implements Runnable{
@@ -39,7 +40,7 @@ public class Server implements Runnable{
         Server server = new Server(29666);
         server.run();
     }
-    
+
     public void run() {
         try {
 
@@ -53,7 +54,7 @@ public class Server implements Runnable{
             serverSocket.configureBlocking(false);
             logger.info("Server is working on:" + serverSocket.getLocalAddress());
 
-            ExecutorService executorService = Executors.newFixedThreadPool(20);
+            ExecutorService readerExecutor = Executors.newFixedThreadPool(20);
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
@@ -64,15 +65,17 @@ public class Server implements Runnable{
                     if (socket != null) {
                         socket.configureBlocking(false);
                         logger.info("Client has connected from:" + socket.getRemoteAddress());
-                        executorService.submit(new Reader(socket));
+                        Reader readerThread = new Reader(socket);
+                        readerExecutor.submit(readerThread);
                     }
                 }
-                 catch (IOException ex) {
+                catch (IOException ex) {
                     System.out.println("Some problems with connection");
                 }
             }
 
-            executorService.shutdown();
+            readerExecutor.shutdown();
+
             dbManager.close();
             serverSocket.close();
 
@@ -81,15 +84,17 @@ public class Server implements Runnable{
         }
     }
 
-   public CollectionManager getCollectionManager() {
+    synchronized public CollectionManager getCollectionManager() {
+        logger.info("getCollection");
         return collectionManager;
-   }
+    }
 
-   public boolean checkUser(@NotNull final String login, @NotNull final String pass) {
-       return dbManager.checkUser(login, pass);
-   }
+    synchronized public boolean checkUser(@NotNull final String login, @NotNull final String pass) {
+        logger.info("checkUser");
+        return dbManager.checkUser(login, pass);
+    }
 
-   public int registerUser(@NotNull final String login, @NotNull final String pass) {
+    synchronized public int registerUser(@NotNull final String login, @NotNull final String pass) {
         return dbManager.createUser(login, pass);
     }
 }

@@ -1,11 +1,15 @@
 package src.database;
 
 import com.sun.istack.internal.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import src.server.Server;
 
 import java.io.Serializable;
 
 public class User implements Serializable {
 
+    private static final Logger logger = LoggerFactory.getLogger(Server.class);
     private int id;
     private String login;
     private String password;
@@ -30,14 +34,17 @@ public class User implements Serializable {
     }
 
     public String getLogin() {
+        logger.info("getLogin");
         return login;
     }
 
     public String getPassword() {
+        logger.info("getPassword");
         return password;
     }
 
     public int getId() {
+        logger.info("getId");
         return id;
     }
 }
