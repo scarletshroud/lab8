@@ -61,9 +61,7 @@ public class CollectionManager {
 
     private void modifyHistory(String command)
     {
-    //    lock.writeLock().lock();
         history.insert(command);
-    //    lock.writeLock().unlock();
     }
 
     /**
@@ -106,17 +104,17 @@ public class CollectionManager {
      */
 
     public String add(Object object) {
-    //    lock.writeLock().lock();
+        lock.writeLock().lock();
         Product product = (Product) object;
         modifyHistory("add");
         int id = dbManager.createProduct(product);
         if (id  != -1) {
             product.setId(id);
             products.add(product);
-        //    lock.writeLock().unlock();
+            lock.writeLock().unlock();
             return "Product was successfully added to the collection.";
         } else {
-      //      lock.writeLock().unlock();
+            lock.writeLock().unlock();
             return "There are some problems with adding a product to collection.";
         }
     }
@@ -127,21 +125,21 @@ public class CollectionManager {
      */
 
     public String addIfMax(Object object) {
-    //    lock.writeLock().lock();
+        lock.writeLock().lock();
         Product product = (Product) object;
         modifyHistory("add_if_max");
         if (product.getPrice() > findMax()) {
             int id = dbManager.createProduct(product);
             if (id != -1) {
                 products.add(product);
-          //      lock.writeLock().unlock();
+                lock.writeLock().unlock();
                 return "Product was successfully added to the collection.";
             } else {
-             //   lock.writeLock().unlock();
+                lock.writeLock().unlock();
                 return "There are some problems with adding a product to collection.";
             }
         } else {
-        //    lock.writeLock().unlock();
+            lock.writeLock().unlock();
             return "You are trying to add the product which isn't a max!";
         }
     }
@@ -151,21 +149,21 @@ public class CollectionManager {
      */
 
     public String addIfMin(Object object) {
-     //   lock.writeLock().lock();
+        lock.writeLock().lock();
         Product product = (Product) object;
         modifyHistory("add_if_min");
         if (product.getPrice() < findMin()) {
             int id = dbManager.createProduct(product);
             if (id != -1) {
                 products.add(product);
-            //    lock.writeLock().unlock();
+                lock.writeLock().unlock();
                 return "Product was successfully added to the collection.";
             } else {
-             //   lock.writeLock().unlock();
+                lock.writeLock().unlock();
                 return "There are some problems with adding a product to collection.";
             }
         }
-        //lock.writeLock().unlock();
+        lock.writeLock().unlock();
         return "You are trying to add the product which isn't a min!";
     }
 
@@ -174,7 +172,7 @@ public class CollectionManager {
      */
 
     public String clear(User user) {
-      //  lock.writeLock().lock();
+        lock.writeLock().lock();
         for (Product p : products) {
             if (p.getHost().equals(user.getLogin())) {
                 products.remove(p);
@@ -183,7 +181,7 @@ public class CollectionManager {
         }
 
         modifyHistory("clear");
-     //   lock.writeLock().unlock();
+        lock.writeLock().unlock();
         return "The collection was cleared.";
     }
 
@@ -192,9 +190,9 @@ public class CollectionManager {
      */
 
     public String executeScript() {
-     //   lock.writeLock().lock();
+        lock.writeLock().lock();
         modifyHistory("execute_script");
-     //   lock.writeLock().unlock();
+        lock.writeLock().unlock();
         return "A new script was started to execute";
     }
 
@@ -203,7 +201,7 @@ public class CollectionManager {
      */
 
     public String filterByUnitOfMeasure(Object object) {
-    //    lock.readLock().lock();
+        lock.readLock().lock();
         String unitOfMeasure = (String) object;
         String result = "The result of filtering by unit of measure:\n";
 
@@ -214,7 +212,7 @@ public class CollectionManager {
         for (Product p : res) {
             result += p.getName() + "\n";
         }
-      //  lock.readLock().lock();
+        lock.readLock().lock();
 
         modifyHistory("filter_by_unit_of_measure");
 
@@ -251,12 +249,12 @@ public class CollectionManager {
      */
 
     public String history() {
-     //   lock.readLock().lock();
+        lock.readLock().lock();
         String result = "The history of your last used src.commands:\n";
         for(int i = 0; i < history.getSize(); i++) {
             result += history.getElement(i) + "\n";
         }
-      //  lock.readLock().unlock();
+        lock.readLock().unlock();
         modifyHistory("history");
         return result;
     }
@@ -265,21 +263,21 @@ public class CollectionManager {
      * Shows info about collection
      */
 
-    public String info() {
-      //  lock.readLock().lock();
+      public String info() {
+        lock.readLock().lock();
         modifyHistory("info");
         try {
             Field treeSetField = CollectionManager.class.getDeclaredField("products");
             String treeSetType = treeSetField.getGenericType().getTypeName();
             if (!products.isEmpty()) {
-           //     lock.readLock().unlock();
+                lock.readLock().unlock();
                 return "Type: " + products.getClass().getName() + "<" + treeSetType + ">" + "\nCreation Date" + creationDate + "\nSize: " + products.size();
             } else {
-        //       lock.readLock().unlock();
+                lock.readLock().unlock();
                 return "Type can not be defined because collection is empty! " + "\nCreation Date" + creationDate + "\nSize: " + products.size();
             }
         } catch (NoSuchFieldException ex) {
-        //    lock.readLock().unlock();
+            lock.readLock().unlock();
             return "Problem with general class. Can not find type of class!";
         }
     }
@@ -289,7 +287,7 @@ public class CollectionManager {
      */
 
     public String printFieldDescendingOwner() {
-      //  lock.readLock().lock();
+        lock.readLock().lock();
         ArrayList<Person> ownersList = new ArrayList<>();
         String result = "The owners:\n";
 
@@ -304,7 +302,7 @@ public class CollectionManager {
         for (Person p : ownersList) {
             result += p.getName() + "\n";
         }
-      //  lock.readLock().unlock();
+        lock.readLock().unlock();
         modifyHistory("print_field_descending_owner");
         return result;
     }
@@ -314,7 +312,7 @@ public class CollectionManager {
      */
 
     public String removeById(User user, Object object) {
-     //   lock.writeLock().lock();
+        lock.writeLock().lock();
         Integer id = (Integer) object;
 
         modifyHistory("remove_by_id");
@@ -324,16 +322,16 @@ public class CollectionManager {
                 if (p.getHost().equals(user.getLogin())) {
                     products.remove(p);
                     dbManager.deleteProduct(id);
-          //          lock.writeLock().unlock();
+                    lock.writeLock().unlock();
                     return "Element was successfully removed.";
                 }
                 else {
-          //          lock.writeLock().unlock();
+                    lock.writeLock().unlock();
                     return "You don't have a permission to change this element!";
                 }
             }
         }
-     //   lock.writeLock().unlock();
+        lock.writeLock().unlock();
         return "The element with this id wasn't found.";
     }
 
@@ -342,7 +340,7 @@ public class CollectionManager {
      */
 
     public String show() {
-     //   lock.readLock().lock();
+        lock.readLock().lock();
         String result = new String();
 
         modifyHistory("show");
@@ -351,10 +349,10 @@ public class CollectionManager {
             for (Product p : products) {
                 result += p.toString() + "\n";
             }
-        //    lock.readLock().unlock();
+            lock.readLock().unlock();
             return result;
         }
-     //   lock.readLock().unlock();
+        lock.readLock().unlock();
         return "Collection is empty.";
     }
 
@@ -363,7 +361,7 @@ public class CollectionManager {
      */
 
     public String printUniquePartNumber() {
-      //  lock.readLock().lock();
+        lock.readLock().lock();
         ArrayList<String> partNumbers = new ArrayList<>();
         String result = new String();
         for(Product product: products) {
@@ -376,7 +374,7 @@ public class CollectionManager {
         for (String s : uniqueNumbers) {
             result += s + "\n";
         }
-      //  lock.readLock().unlock();
+        lock.readLock().unlock();
         return result;
     }
 
@@ -385,7 +383,7 @@ public class CollectionManager {
      */
 
     public String updateId(User user, Object object) {
-       // lock.writeLock().lock();
+        lock.writeLock().lock();
         Object[] objects = (Object[]) object;
         Integer id = (Integer) objects[0];
         String name = (String) objects[1];
@@ -402,14 +400,14 @@ public class CollectionManager {
                     product.setName(name);
 
                     dbManager.updateProduct(product);
-        //            lock.writeLock().unlock();
+                    lock.writeLock().unlock();
                     return "The element's id was successfully updated!";
                 }
-           //     lock.writeLock().unlock();
+                lock.writeLock().unlock();
                 return "You don't have a permission to change this element!";
             }
         }
-    //    lock.writeLock().unlock();
+        lock.writeLock().unlock();
         return "This id is busy.";
 
     }

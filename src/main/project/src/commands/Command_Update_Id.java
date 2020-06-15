@@ -40,10 +40,14 @@ public class Command_Update_Id extends Command implements Serializable {
     @Override
     public Packet executeOnClient(boolean authorized, User user, String ... args) {
         if (authorized) {
-            int id = Integer.parseInt(args[0]);
-            String name = args[1];
-            Object[] argsToSend = new Object[]{id, name};
-            return new Packet(this, user, argsToSend);
+            try {
+                int id = Integer.parseInt(args[0]);
+                String name = args[1];
+                Object[] argsToSend = new Object[]{id, name};
+                return new Packet(this, user, argsToSend);
+            } catch (NumberFormatException ex) {
+                System.out.println("Arguments aren't correct.");
+            }
         }
         System.out.println("You must be logged in to continue working.");
         return null;

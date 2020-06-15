@@ -105,7 +105,7 @@ public class ProductDAO implements DAO<Product, String> {
         try (PreparedStatement statement = connection.prepareStatement(sqlQueries.UPDATE.QUERY)) {
             statement.setInt(1, product.getId());
             statement.setString(2, product.getName());
-            statement.executeQuery().next();
+            statement.executeQuery();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
             ex.printStackTrace();
@@ -115,8 +115,8 @@ public class ProductDAO implements DAO<Product, String> {
     enum sqlQueries {
         INSERT("INSERT INTO products (id, name, coordinate_x, coordinate_y, creation_date, price, part_number, unit_of_measure, person_name, person_height, person_eyeColor, location_name, location_x, location_y, location_z, creator) VALUES (DEFAULT, (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?), (?)) RETURNING id"),
         GET("SELECT p.id, p.name, p.coordinate_x, p.coordinate_y, p.creation_date, p.price, p.part_number, p.unit_of_measure, p.person_name, p.person_height, p.person_eyeColor, p.location_name, p.location_x, p.location_y, p.location_z, host FROM products"),
-        UPDATE("UPDATE products SET id IN(?) WHERE name IN(?)"),
-        DELETE("DELETE FROM products WHERE id  IN(?)"),
+        UPDATE("UPDATE products SET id = (?) WHERE name = (?)"),
+        DELETE("DELETE FROM products WHERE id = (?)"),
         GET_ALL("SELECT * FROM products");
 
         String QUERY;

@@ -1,7 +1,6 @@
 package src.client;
 
 import com.sun.istack.internal.NotNull;
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import src.database.User;
@@ -55,8 +54,8 @@ public class Client implements Runnable {
             oos = new DataOutputStream(socket.getOutputStream());
             ois = new DataInputStream(socket.getInputStream());
 
-           // logger.info("Client connected to socket");
-       //     logger.info("Client writing channel = oos & reading channel = ois initialized.");
+            logger.info("Client connected to socket");
+            logger.info("Client writing channel = oos & reading channel = ois initialized.");
 
             System.out.println("Hello, you are connected to server.");
             System.out.println("Firstly, you should to login or register. (enter \"login\" or \"register\")");
@@ -68,7 +67,7 @@ public class Client implements Runnable {
             while(!socket.isOutputShutdown()) {
 
                 if (br.ready()) {
-                  //  logger.info("Client started writing a message to server...");
+                    logger.info("Client started writing a message to server...");
                     String userInput = br.readLine();
                     close = handleRequest(userInput);
 
@@ -81,12 +80,12 @@ public class Client implements Runnable {
             oos.close();
             ois.close();
             socket.close();
-        //    logger.info("Closing the connection...");
+            logger.info("Closing the connection...");
             System.out.println("Goodbye!");
 
         } catch (IOException | InterruptedException  ex) {
             System.out.println("Server is not working. Try to connect later.");
-     //       logger.info("Unable to connect to server.");
+            logger.info("Unable to connect to server.");
         }
     }
 
@@ -133,14 +132,14 @@ public class Client implements Runnable {
                 byte[] message = serializeObject(packet);
                 oos.write(message);
                 oos.flush();
-     //           logger.info("Client sent message " + userInput + " to server.");
+                logger.info("Client sent message " + userInput + " to server.");
 
-      //          logger.info("Client sent message & start waiting for data from server...");
+                logger.info("Client sent message & start waiting for data from server...");
 
                 while (ois.available() <= 0) {
                 }
 
-            //    logger.info("Trying to read data...");
+                logger.info("Trying to read data...");
                 byte[] bytes = new byte[BUFFER_SIZE];
                 ois.read(bytes);
                 String input = new String(bytes);
