@@ -17,7 +17,7 @@ public class DBManager {
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
     private String DB_URL = "jdbc:postgresql://localhost:5432/lab7";
     private String USER = "postgres";
-    private String PASS = "B7OQdoHH";
+    private String PASS = "";
     private Connection connection;
     private ProductDAO productDAO;
     private UserDAO userDAO;
