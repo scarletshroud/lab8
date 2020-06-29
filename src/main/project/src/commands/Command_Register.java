@@ -2,6 +2,7 @@ package src.commands;
 
 import src.database.User;
 import src.logic.Packet;
+import src.logic.ServerPacket;
 import src.server.Server;
 
 import java.io.BufferedReader;
@@ -21,44 +22,21 @@ public class Command_Register extends Command implements Serializable {
         return args.length == 0;
     }
 
-    public String executeOnServer(Server server, User user, Object object)
+    public ServerPacket executeOnServer(Server server, User user, Object object)
     {
         if (server.registerUser(user.getLogin(), user.getPassword()) != -1) {
-            return "Registration is successful!";
+            return new ServerPacket(null, "Registration is successful!", true, true);
         } else {
-            return "The login is already exist";
+            return new ServerPacket(null, "The login is already exist", false, true);
         }
     }
 
     @Override
     public Packet executeOnClient(boolean authorized, User user, String ... args) {
         Packet packet = new Packet();
-        System.out.println("Enter the login.");
-        try {
-            String login = null;
-            String pass = null;
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-            while (login == null) {
-                if (br.ready()) {
-                    login = br.readLine();
-                }
-            }
-            System.out.println("Enter the password");
-            while (pass == null) {
-                if (br.ready()) {
-                    pass = inputToHash(br.readLine());
-                }
-            }
-
-            user.setLogin(login);
-            user.setPassword(pass);
-
-            packet.wrap(this, user, null);
-            return packet;
-        } catch (IOException ex) {
-            System.out.println("Problems with buffered reader.");
-        }
-        return null;
+        user.setPassword(inputToHash(user.getPassword()));
+        packet.wrap(this, user, null);
+        return packet;
     }
 
     private String inputToHash(String pass) {

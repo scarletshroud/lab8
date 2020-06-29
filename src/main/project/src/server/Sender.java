@@ -1,19 +1,20 @@
 package src.server;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+import src.logic.ServerPacket;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.StandardCharsets;
 
 public class Sender implements Runnable {
 
     private SocketChannel socket;
-    private String answer;
+    private ServerPacket answer;
     private final int BUFFER_SIZE = 4096;
 
-    Sender(SocketChannel socket, String answer) {
+    Sender(SocketChannel socket, ServerPacket answer) {
         this.socket = socket;
         this.answer = answer;
     }
@@ -24,14 +25,8 @@ public class Sender implements Runnable {
 
             ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
             buffer.clear();
-            byte[] bytes;
 
-            if (answer != null) {
-                 bytes = answer.getBytes(StandardCharsets.UTF_8);
-            } else {
-                 bytes = "Something wrong.".getBytes(StandardCharsets.UTF_8);
-            }
-
+            byte[] bytes = serializeObject(answer);
             buffer = ByteBuffer.wrap(bytes);
 
             while (buffer.hasRemaining()) {
@@ -43,7 +38,17 @@ public class Sender implements Runnable {
             System.out.println(ex.getMessage());
             notify();
         }
+    }
 
+    private byte[] serializeObject(ServerPacket packet) throws IOException {
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+
+        objectOutputStream.writeObject(packet);
+        objectOutputStream.flush();
+
+        return byteArrayOutputStream.toByteArray();
     }
 
 }

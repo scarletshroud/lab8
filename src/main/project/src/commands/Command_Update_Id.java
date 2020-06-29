@@ -2,6 +2,7 @@ package src.commands;
 
 import src.database.User;
 import src.logic.Packet;
+import src.logic.ServerPacket;
 import src.server.Server;
 
 import java.io.Serializable;
@@ -30,11 +31,11 @@ public class Command_Update_Id extends Command implements Serializable {
      */
 
     @Override
-    public String executeOnServer(Server server, User user, Object object) {
+    public ServerPacket executeOnServer(Server server, User user, Object object) {
         if (server.checkUser(user.getLogin(), user.getPassword())) {
-            return server.getCollectionManager().updateId(user, object);
+            return new ServerPacket(null, server.getCollectionManager().updateId(user, object), true, true);
         }
-        return "You don't have rights to interact with collection!";
+        return new ServerPacket(null, "You don't have rights to interact with collection!", false, true);
     }
 
     @Override

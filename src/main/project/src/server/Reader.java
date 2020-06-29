@@ -3,6 +3,7 @@ package src.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import src.logic.Packet;
+import src.logic.ServerPacket;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -40,9 +41,9 @@ public class Reader implements Runnable {
                     Packet packet = deserialize(bytes);
                     if (packet != null) {
                         Handler handler = new Handler(packet);
-                        Future<String> result = handlerPool.submit(handler);
+                        Future<ServerPacket> result = handlerPool.submit(handler);
                         try {
-                            String answer = result.get(30, TimeUnit.SECONDS);
+                            ServerPacket answer = result.get(30, TimeUnit.SECONDS);
                             Sender sender = new Sender(socket, answer);
                             senderExecutor.submit(sender);
                         } catch (InterruptedException | ExecutionException | TimeoutException ex) {

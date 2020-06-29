@@ -3,6 +3,7 @@ package src.commands;
 import src.client.Client;
 import src.database.User;
 import src.logic.CollectionManager;
+import src.logic.ServerPacket;
 import src.server.Server;
 
 import java.io.Serializable;
@@ -31,10 +32,10 @@ public class Command_Print_Unique_Part_Number extends Command implements Seriali
      */
 
     @Override
-    public String executeOnServer(Server server, User user, Object object) {
+    public ServerPacket executeOnServer(Server server, User user, Object object) {
         if (server.checkUser(user.getLogin(), user.getPassword())) {
-            return server.getCollectionManager().printUniquePartNumber();
+            return new ServerPacket(null, server.getCollectionManager().printUniquePartNumber(), true, true);
         }
-        return "You don't have rights to interact with collection!";
+        return new ServerPacket(null, "You don't have rights to interact with collection!", false, true);
     }
 }

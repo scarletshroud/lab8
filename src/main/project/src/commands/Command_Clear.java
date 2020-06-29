@@ -4,6 +4,7 @@ import src.client.Client;
 import src.database.User;
 import src.exceptions.BadNumberOfArgsException;
 import src.logic.CollectionManager;
+import src.logic.ServerPacket;
 import src.server.Server;
 
 import java.io.Serializable;
@@ -32,10 +33,10 @@ public class Command_Clear extends Command implements Serializable {
      */
 
     @Override
-    synchronized public String executeOnServer(Server server, User user, Object object) {
+    synchronized public ServerPacket executeOnServer(Server server, User user, Object object) {
         if (server.checkUser(user.getLogin(), user.getPassword())) {
-            return server.getCollectionManager().clear(user);
+            return new ServerPacket(null, server.getCollectionManager().clear(user), true, true);
         }
-        return "You don't have rights to interact with collection!";
+        return new ServerPacket(null, "You don't have rights to interact with collection!", false, true);
     }
 }

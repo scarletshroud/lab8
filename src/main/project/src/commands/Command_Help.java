@@ -6,6 +6,7 @@ import src.client.Client;
 import src.database.User;
 import src.exceptions.BadNumberOfArgsException;
 import src.logic.CollectionManager;
+import src.logic.ServerPacket;
 import src.server.Server;
 
 import java.io.Serializable;
@@ -36,11 +37,11 @@ public class Command_Help extends Command implements Serializable {
      */
 
     @Override
-    public String executeOnServer(Server server, User user, Object object) {
+    public ServerPacket executeOnServer(Server server, User user, Object object) {
         logger.info("executeCommand");
         if (server.checkUser(user.getLogin(), user.getPassword())) {
-            return server.getCollectionManager().help();
+            return new ServerPacket(null, server.getCollectionManager().help(), true, true);
         }
-        return "You don't have rights to interact with collection!";
+        return new ServerPacket(null, "You don't have rights to interact with collection!", false, true);
     }
 }

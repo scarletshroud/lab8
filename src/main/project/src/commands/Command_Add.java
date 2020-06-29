@@ -7,6 +7,7 @@ import src.elements.Location;
 import src.elements.Person;
 import src.elements.Product;
 import src.logic.Packet;
+import src.logic.ServerPacket;
 import src.server.Server;
 
 import javax.xml.bind.ValidationException;
@@ -39,18 +40,18 @@ public class Command_Add extends Command implements Serializable {
      */
 
     @Override
-    public String executeOnServer(Server server, User user, Object object)  {
+    public ServerPacket executeOnServer(Server server, User user, Object object)  {
             if (server.checkUser(user.getLogin(), user.getPassword())) {
-                return server.getCollectionManager().add(object);
+                return new ServerPacket(null, server.getCollectionManager().add(object), true, true);
             }
-            return "You don't have rights to interact with collection!";
+            return new ServerPacket(null, "You don't have rights to interact with collection!", false, true);
     }
 
     @Override
     public Packet executeOnClient(boolean authorized, User user, String ... args) {
         if (authorized) {
-            Product product = new Product();
-            if (readElement(product, user, args[0])) {
+            Product product = buildProduct(args);
+            if (product != null) {
                 System.out.println("Ready to add element to collection!");
                 return new Packet(this, user, product);
             } else {
@@ -62,85 +63,47 @@ public class Command_Add extends Command implements Serializable {
         return null;
     }
 
-    private boolean readElement(Product product, User user, String name) {
-        boolean success = true;
+    private Product buildProduct(String[] args) {
+
+        Product product = new Product();
         Coordinates coordinates = new Coordinates();
         Location location = new Location();
         Person person = new Person();
-        Scanner scanner = new Scanner(System.in);
-        String nextValue = new String();
-        product.setName(name);
-        product.setHost(user.getLogin());
-        LocalDate creationDate = LocalDate.now();
-        product.setCreationDate(creationDate);
+        product.setName(args[0]);
+        product.setHost(args[13]);
+
+        product.setCreationDate(LocalDate.now());
 
         try {
-            System.out.println("Enter the coordinate x of coordinates");
-            nextValue = scanner.nextLine();
-            coordinates.setX(Float.parseFloat(nextValue));
+            coordinates.setX(Float.parseFloat(args[1]));
+            coordinates.setY(Double.parseDouble(args[2]));
 
-            System.out.println("Enter the coordinate y of coordinates");
-            nextValue = scanner.nextLine();
-            coordinates.setY(Double.parseDouble(nextValue));
+            location.setX(Long.parseLong(args[10]));
+            location.setY(Long.parseLong(args[11]));
+            location.setZ(Integer.parseInt(args[12]));
 
-            System.out.println("Enter the coordinate x of location");
-            nextValue = scanner.nextLine();
-            location.setX(Long.parseLong(nextValue));
+            location.setName(args[9]);
+            person.setName(args[6]);
 
-            System.out.println("Enter the coordinate y of location");
-            nextValue = scanner.nextLine();
-            location.setY(Long.parseLong(nextValue));
-
-            System.out.println("Enter the coordinate z of location");
-            nextValue = scanner.nextLine();
-            location.setZ(Integer.parseInt(nextValue));
-
-            System.out.println("Enter the name of location");
-            nextValue = scanner.nextLine();
-            location.setName(nextValue);
-
-            System.out.println("Enter the name of person");
-            nextValue = scanner.nextLine();
-            person.setName(nextValue);
-
-            System.out.println("Enter the height of person");
-            nextValue = scanner.nextLine();
-            person.setHeight(Integer.parseInt(nextValue));
-
-            System.out.println("Enter the person's color of eyes");
-            nextValue = scanner.nextLine();
-            person.setEyeColor(nextValue);
+            person.setHeight(Integer.parseInt(args[7]));
+            person.setEyeColor(args[8]);
 
             person.setLocation(location);
 
-            System.out.println("Enter the price of product");
-            nextValue = scanner.nextLine();
-            product.setPrice(Long.parseLong(nextValue));
+            product.setPrice(Long.parseLong(args[3]));
 
-            System.out.println("Enter the part number of product");
-            nextValue = scanner.nextLine();
-            product.setPartNumber(nextValue);
+            product.setPartNumber(args[4]);
 
-            System.out.println("Enter the unit of measure of product");
-            nextValue = scanner.nextLine();
-            product.setUnitOfMeasure(nextValue);
+            product.setUnitOfMeasure(args[5]);
 
             product.setCoordinates(coordinates);
             product.setOwner(person);
-        }
+            return product;
 
-        catch (NumberFormatException ex) {
-            if (nextValue.equals("")) {
-                System.err.println("Empty string!");
-            } else {
-                System.err.println("Invalid value!");
-            }
-            success = false;
         } catch (ValidationException ex) {
             System.err.println(ex.getMessage());
-            success = false;
+            return null;
         }
 
-        return success;
     }
 }

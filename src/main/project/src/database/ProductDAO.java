@@ -1,10 +1,13 @@
 package src.database;
 
 import com.sun.istack.internal.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import src.elements.Coordinates;
 import src.elements.Location;
 import src.elements.Person;
 import src.elements.Product;
+import src.server.Server;
 
 import javax.xml.bind.ValidationException;
 import java.sql.*;
@@ -15,6 +18,7 @@ import java.util.ArrayList;
 public class ProductDAO implements DAO<Product, String> {
 
     private Connection connection;
+    private static final Logger logger = LoggerFactory.getLogger(ProductDAO.class);
 
     ProductDAO(final Connection connection) {
         this.connection = connection;
@@ -107,8 +111,7 @@ public class ProductDAO implements DAO<Product, String> {
             statement.setString(2, product.getName());
             statement.executeQuery();
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-            ex.printStackTrace();
+            logger.info(ex.getMessage());
         }
     }
 

@@ -7,12 +7,13 @@ import org.slf4j.LoggerFactory;
 import src.database.DBManager;
 import src.logic.CollectionManager;
 
-import javax.xml.bind.ValidationException;
 import java.io.*;
 import java.net.InetSocketAddress;
 
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,7 +28,6 @@ public class Server implements Runnable{
     private DBManager dbManager;
 
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
-
 
     public Server(int port) {
         server = this;
@@ -53,14 +53,26 @@ public class Server implements Runnable{
             logger.info("Server is working on:" + serverSocket.getLocalAddress());
 
             ExecutorService readerExecutor = Executors.newFixedThreadPool(20);
+            ExecutorService observerExecutor = Executors.newSingleThreadExecutor();
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
+            ArrayList<SocketChannel> socketChannels = new ArrayList<>();
+
+        //    Observer observer = new Observer();
+        //    observer.start();
+
             while (!(reader.ready() && reader.readLine().trim().equals("exit"))) {
+
+                if (collectionManager.isChanged()) {
+                    observerExecutor.submit(new Observer(socketChannels, collectionManager));
+                    collectionManager.handleChanges();
+                }
 
                 try {
                     SocketChannel socket = serverSocket.accept();
                     if (socket != null) {
+                        socketChannels.add(socket);
                         socket.configureBlocking(false);
                         logger.info("Client has connected from:" + socket.getRemoteAddress());
                         Reader readerThread = new Reader(socket);
@@ -77,7 +89,10 @@ public class Server implements Runnable{
             dbManager.close();
             serverSocket.close();
 
-        } catch (IOException | ValidationException ex) {
+            logger.info("Server finished his work.");
+            System.out.println("Server finished his work.");
+
+        } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
     }

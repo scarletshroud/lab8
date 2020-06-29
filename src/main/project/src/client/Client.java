@@ -3,27 +3,35 @@ package src.client;
 import com.sun.istack.internal.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import src.client.gui.AuthorizationWindow;
 import src.database.User;
 import src.exceptions.InvalidCommand;
 import src.logic.CommandHandler;
 import src.commands.*;
 import src.logic.Packet;
+import src.logic.SerializationManager;
+import src.logic.ServerPacket;
 
+import javax.swing.*;
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.ArrayList;
 
 public class Client implements Runnable {
+
+    public static Client client;
 
     private CommandHandler commandHandler;
     private DataInputStream ois;
     private DataOutputStream oos;
 
+    private static AuthorizationWindow authorizationWindow;
+
     private final String host;
     private final int port;
+
     private final int BUFFER_SIZE = 4096;
-    private boolean authorized;
+    private Boolean authorized;
 
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
     private static User user;
@@ -44,6 +52,12 @@ public class Client implements Runnable {
     public static void main(String[] args) {
         Client client = new Client("localhost", 29666);
         client.run();
+        try {
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+        } catch (Exception e) {
+            System.err.println("Look and feel not set.");
+        }
+        authorizationWindow = new AuthorizationWindow(client);
     }
 
     @Override
@@ -57,39 +71,27 @@ public class Client implements Runnable {
             logger.info("Client connected to socket");
             logger.info("Client writing channel = oos & reading channel = ois initialized.");
 
-            System.out.println("Hello, you are connected to server.");
-            System.out.println("Firstly, you should to login or register. (enter \"login\" or \"register\")");
-
-            boolean close = false;
-
             registerCommands();
 
-            while(!socket.isOutputShutdown()) {
-
-                if (br.ready()) {
-                    logger.info("Client started writing a message to server...");
-                    String userInput = br.readLine();
-                    close = handleRequest(userInput);
-
-                    if (close) {
-                        break;
-                    }
-                }
-            }
-
-            oos.close();
-            ois.close();
-            socket.close();
-            logger.info("Closing the connection...");
-            System.out.println("Goodbye!");
-
-        } catch (IOException | InterruptedException  ex) {
+        } catch (IOException ex) {
             System.out.println("Server is not working. Try to connect later.");
             logger.info("Unable to connect to server.");
         }
     }
 
-    private boolean handleRequest(String userInput) throws IOException, InterruptedException{
+    public void close(Socket socket, DataInputStream ois, DataOutputStream oos) {
+        try {
+            oos.close();
+            ois.close();
+            socket.close();
+            logger.info("Closing the connection...");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            logger.info("Some problems with closing the socket!");
+        }
+    }
+
+    public boolean handleRequest(String userInput) throws IOException {
 
         try {
 
@@ -109,12 +111,12 @@ public class Client implements Runnable {
                     ArrayList<Packet> packets = com.execute(authorized, user, userInput);
                     if (packets != null) {
                         for (Packet p : packets) {
-                            sendRequest(p, userInput);
+                            sendRequest(p);
                         }
                     }
                 } else {
                     Packet packet = command.executeOnClient(authorized, user, args);
-                    return sendRequest(packet, userInput);
+                    return sendRequest(packet);
                 }
             }
 
@@ -124,33 +126,19 @@ public class Client implements Runnable {
         return false;
     }
 
-    private boolean sendRequest(Packet packet, String userInput) throws IOException {
+    public boolean sendRequest(Packet packet) {
         try {
 
             if (packet != null) {
 
-                byte[] message = serializeObject(packet);
+                byte[] message = SerializationManager.serializeObject(packet);
                 oos.write(message);
                 oos.flush();
-                logger.info("Client sent message " + userInput + " to server.");
+                logger.info("Client sent message to server.");
 
                 logger.info("Client sent message & start waiting for data from server...");
-
-                while (ois.available() <= 0) {
-                }
-
-                logger.info("Trying to read data...");
-                byte[] bytes = new byte[BUFFER_SIZE];
-                ois.read(bytes);
-                String input = new String(bytes);
-
-                if(!authorized && input.contains("Authorization is successful!")) {
-                    authorized = true;
-                }
-
-                System.out.println(input);
             }
-        } catch (SocketException ex) {
+        } catch (IOException ex) {
             logger.info("Client lost connection with server. Stopping work.");
             System.out.println("At the moment server is not working");
             return true;
@@ -158,15 +146,20 @@ public class Client implements Runnable {
         return false;
     }
 
-    private byte[] serializeObject(Packet packet) throws IOException {
+    public ServerPacket acceptAnswer() {
+        try {
 
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            while (ois.available() <= 0) { }
 
-        objectOutputStream.writeObject(packet);
-        objectOutputStream.flush();
+            logger.info("Trying to read data...");
+            byte[] bytes = new byte[BUFFER_SIZE];
+            ois.read(bytes);
+            return SerializationManager.deserializeObject(bytes);
 
-        return byteArrayOutputStream.toByteArray();
+        } catch (IOException ex) {
+            logger.info("Some problems with accepting the answer.");
+            return null;
+        }
     }
 
     private String[] createArgs(@NotNull String input) {
@@ -194,5 +187,26 @@ public class Client implements Runnable {
         commandHandler.register("filter_by_unit_of_measure", new Command_Filter_By_Unit_Of_Measure());
         commandHandler.register("print_unique_part_number", new Command_Print_Unique_Part_Number());
         commandHandler.register("print_field_descending_owner", new Command_Print_Field_Descending_Owner());
+    }
+
+    public Boolean getAuthorized() {
+        return authorized;
+    }
+
+    public void setAuthorized(boolean b) {
+        authorized = b;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public DataInputStream getDataInputStream() {
+        return ois;
+    }
+
+    public void clearUser() {
+        user = new User();
+        authorized = false;
     }
 }

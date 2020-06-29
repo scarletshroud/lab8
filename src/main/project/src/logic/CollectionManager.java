@@ -31,6 +31,7 @@ public class CollectionManager {
     private DefaultQueue history;
     private Scanner scanner;
     private boolean exit = false;
+    private boolean hasChanges = false;
 
     private ReadWriteLock lock;
 
@@ -38,11 +39,9 @@ public class CollectionManager {
 
     /**
      * Constructor
-     * @throws ValidationException
-     * @throws IOException
      */
 
-    public CollectionManager(DBManager dbManager) throws ValidationException, IOException {
+    public CollectionManager(DBManager dbManager) {
 
         products = new TreeSet<>();
         creationDate = LocalDateTime.now();
@@ -112,10 +111,11 @@ public class CollectionManager {
             product.setId(id);
             products.add(product);
             lock.writeLock().unlock();
-            return "Product was successfully added to the collection.";
+            hasChanges = true;
+            return "Product was successfully added to the collection.\n";
         } else {
             lock.writeLock().unlock();
-            return "There are some problems with adding a product to collection.";
+            return "There are some problems with adding a product to collection.\n";
         }
     }
 
@@ -133,14 +133,15 @@ public class CollectionManager {
             if (id != -1) {
                 products.add(product);
                 lock.writeLock().unlock();
-                return "Product was successfully added to the collection.";
+                hasChanges = true;
+                return "Product was successfully added to the collection.\n";
             } else {
                 lock.writeLock().unlock();
-                return "There are some problems with adding a product to collection.";
+                return "There are some problems with adding a product to collection.\n";
             }
         } else {
             lock.writeLock().unlock();
-            return "You are trying to add the product which isn't a max!";
+            return "You are trying to add the product which isn't a max!\n";
         }
     }
 
@@ -156,15 +157,16 @@ public class CollectionManager {
             int id = dbManager.createProduct(product);
             if (id != -1) {
                 products.add(product);
+                hasChanges = true;
                 lock.writeLock().unlock();
-                return "Product was successfully added to the collection.";
+                return "Product was successfully added to the collection.\n";
             } else {
                 lock.writeLock().unlock();
-                return "There are some problems with adding a product to collection.";
+                return "There are some problems with adding a product to collection.\n";
             }
         }
         lock.writeLock().unlock();
-        return "You are trying to add the product which isn't a min!";
+        return "You are trying to add the product which isn't a min!\n";
     }
 
     /**
@@ -173,6 +175,7 @@ public class CollectionManager {
 
     public String clear(User user) {
         lock.writeLock().lock();
+
         for (Product p : products) {
             if (p.getHost().equals(user.getLogin())) {
                 products.remove(p);
@@ -180,9 +183,10 @@ public class CollectionManager {
             }
         }
 
+        hasChanges = true;
         modifyHistory("clear");
         lock.writeLock().unlock();
-        return "The collection was cleared.";
+        return "The collection was cleared.\n";
     }
 
     /**
@@ -193,7 +197,7 @@ public class CollectionManager {
         lock.writeLock().lock();
         modifyHistory("execute_script");
         lock.writeLock().unlock();
-        return "A new script was started to execute";
+        return "A new script was started to execute\n";
     }
 
     /**
@@ -212,6 +216,7 @@ public class CollectionManager {
         for (Product p : res) {
             result += p.getName() + "\n";
         }
+
         lock.readLock().lock();
 
         modifyHistory("filter_by_unit_of_measure");
@@ -241,11 +246,11 @@ public class CollectionManager {
                 "\nhistory : вывести последние 11 команд (без их аргументов)" +
                 "\nfilter_by_unit_of_measure unitOfMeasure : вывести элементы, значение поля unitOfMeasure которых равно заданному" +
                 "\nprint_unique_part_number partNumber : вывести уникальные значения поля partNumber" +
-                "\nprint_field_descending_owner owner : вывести значения поля owner в порядке убывания";
+                "\nprint_field_descending_owner owner : вывести значения поля owner в порядке убывания\n";
     }
 
     /**
-     * Shows history of last used src.commands
+     * Shows history of last used commands
      */
 
     public String history() {
@@ -271,14 +276,14 @@ public class CollectionManager {
             String treeSetType = treeSetField.getGenericType().getTypeName();
             if (!products.isEmpty()) {
                 lock.readLock().unlock();
-                return "Type: " + products.getClass().getName() + "<" + treeSetType + ">" + "\nCreation Date" + creationDate + "\nSize: " + products.size();
+                return "Type: " + products.getClass().getName() + "<" + treeSetType + ">" + "\nCreation Date" + creationDate + "\nSize: " + products.size() + "\n";
             } else {
                 lock.readLock().unlock();
-                return "Type can not be defined because collection is empty! " + "\nCreation Date" + creationDate + "\nSize: " + products.size();
+                return "Type can not be defined because collection is empty! " + "\nCreation Date" + creationDate + "\nSize: " + products.size() + "\n";
             }
         } catch (NoSuchFieldException ex) {
             lock.readLock().unlock();
-            return "Problem with general class. Can not find type of class!";
+            return "Problem with general class. Can not find type of class!\n";
         }
     }
 
@@ -322,38 +327,34 @@ public class CollectionManager {
                 if (p.getHost().equals(user.getLogin())) {
                     products.remove(p);
                     dbManager.deleteProduct(id);
+                    hasChanges = true;
                     lock.writeLock().unlock();
-                    return "Element was successfully removed.";
+                    return "Element was successfully removed.\n";
                 }
                 else {
                     lock.writeLock().unlock();
-                    return "You don't have a permission to change this element!";
+                    return "You don't have a permission to change this element!\n";
                 }
             }
         }
         lock.writeLock().unlock();
-        return "The element with this id wasn't found.";
+        return "The element with this id wasn't found.\n";
     }
 
     /**
      * Shows collection in string presentation
      */
 
-    public String show() {
+    public ArrayList<Product> show() {
         lock.readLock().lock();
-        String result = new String();
-
-        modifyHistory("show");
 
         if (!products.isEmpty()) {
-            for (Product p : products) {
-                result += p.toString() + "\n";
-            }
+            ArrayList<Product> result = new ArrayList<>(products);
             lock.readLock().unlock();
             return result;
         }
         lock.readLock().unlock();
-        return "Collection is empty.";
+        return null;
     }
 
     /**
@@ -400,20 +401,24 @@ public class CollectionManager {
                     product.setName(name);
 
                     dbManager.updateProduct(product);
+                    hasChanges = true;
                     lock.writeLock().unlock();
-                    return "The element's id was successfully updated!";
+                    return "The element's id was successfully updated!\n";
                 }
                 lock.writeLock().unlock();
-                return "You don't have a permission to change this element!";
+                return "You don't have a permission to change this element!\n";
             }
         }
         lock.writeLock().unlock();
-        return "This id is busy.";
+        return "This id is busy.\n";
 
     }
 
-    public boolean getExit() {
-        return exit;
+    public boolean isChanged() {
+        return hasChanges;
     }
 
+    public void handleChanges() {
+        hasChanges = false;
+    }
 }

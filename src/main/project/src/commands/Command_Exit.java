@@ -4,6 +4,7 @@ import src.client.Client;
 import src.database.User;
 import src.logic.CollectionManager;
 import src.logic.Packet;
+import src.logic.ServerPacket;
 import src.server.Server;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class Command_Exit extends Command implements Serializable {
      */
 
     @Override
-    public String executeOnServer(Server server, User user, Object object) {
+    public ServerPacket executeOnServer(Server server, User user, Object object) {
        return null;
     }
 

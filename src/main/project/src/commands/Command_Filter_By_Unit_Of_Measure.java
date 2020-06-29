@@ -5,6 +5,7 @@ import src.client.Client;
 import src.database.User;
 import src.logic.CollectionManager;
 import src.logic.Packet;
+import src.logic.ServerPacket;
 import src.server.Server;
 
 import java.io.Serializable;
@@ -33,11 +34,11 @@ public class Command_Filter_By_Unit_Of_Measure extends Command implements Serial
      */
 
     @Override
-    public String executeOnServer(Server server,User user, Object object) {
+    public ServerPacket executeOnServer(Server server, User user, Object object) {
         if (server.checkUser(user.getLogin(), user.getPassword())) {
-            return server.getCollectionManager().filterByUnitOfMeasure(object);
+            return new ServerPacket(null, server.getCollectionManager().filterByUnitOfMeasure(object), true, true);
         }
-        return "You don't have rights to interact with collection!";
+        return new ServerPacket(null,"You don't have rights to interact with collection!", false, true);
     }
 
     @Override

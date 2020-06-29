@@ -1,6 +1,7 @@
 package src.commands;
 
 import src.database.User;
+import src.logic.ServerPacket;
 import src.server.Server;
 
 import java.io.Serializable;
@@ -29,10 +30,10 @@ public class Command_Print_Field_Descending_Owner extends Command implements Ser
      */
 
     @Override
-    public String executeOnServer(Server server, User user, Object object) {
+    public ServerPacket executeOnServer(Server server, User user, Object object) {
         if (server.checkUser(user.getLogin(), user.getPassword())) {
-            return server.getCollectionManager().printFieldDescendingOwner();
+            return new ServerPacket(null, server.getCollectionManager().printFieldDescendingOwner(), true, true);
         }
-        return "You don't have rights to interact with collection!";
+        return new ServerPacket(null, "You don't have rights to interact with collection!", false, true);
     }
 }
