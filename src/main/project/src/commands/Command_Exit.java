@@ -39,7 +39,7 @@ public class Command_Exit extends Command implements Serializable {
     }
 
     @Override
-    public Packet executeOnClient(boolean authorized, User user, String ... args) {
+    public Packet executeOnClient(boolean authorized, User user, Object args) {
        return null;
     }
 }

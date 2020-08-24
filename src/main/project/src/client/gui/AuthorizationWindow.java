@@ -9,6 +9,7 @@ import src.logic.ServerPacket;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ResourceBundle;
 
 public class AuthorizationWindow extends JFrame {
     private JPanel main;
@@ -16,11 +17,13 @@ public class AuthorizationWindow extends JFrame {
     private JButton logInButton;
     private JButton registerButton;
     private JPasswordField passwordField;
+    private JLabel passwordLabel;
+    private JLabel loginLabel;
 
     private Client client;
     private User user;
 
-    public AuthorizationWindow(Client client) {
+    public AuthorizationWindow(Client client, Localizer localizer) {
 
         this.client = client;
         this.user = client.getUser();
@@ -28,9 +31,11 @@ public class AuthorizationWindow extends JFrame {
         setContentPane(main);
         setVisible(true);
         setResizable(false);
-        setSize(250, 120);
+        setSize(270, 120);
         setDefaultLookAndFeelDecorated(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        localizeInterface(localizer.getBundle());
 
         registerButton.addActionListener(new ActionListener() {
             @Override
@@ -40,9 +45,7 @@ public class AuthorizationWindow extends JFrame {
                  Command_Register com = new Command_Register();
                  user.setLogin(login);
                  user.setPassword(pass);
-                 client.sendRequest(com.executeOnClient(client.getAuthorized(), user));
-                 String answer = client.acceptAnswer().getMessage();
-                 JOptionPane.showMessageDialog(AuthorizationWindow.this, answer);
+                 client.sendRequest(com.executeOnClient(client.getAuthorized(), user, null));
             }
         });
 
@@ -54,18 +57,15 @@ public class AuthorizationWindow extends JFrame {
                 Command_Login com = new Command_Login();
                 user.setLogin(login);
                 user.setPassword(pass);
-                client.sendRequest(com.executeOnClient(client.getAuthorized(), user));
-
-                ServerPacket serverPacket = client.acceptAnswer();
-
-                if (!client.getAuthorized() && serverPacket.getIsSuccessful()) {
-                    client.setAuthorized(true);
-                    Workspace workspace = new Workspace(client);
-                    dispose();
-                }
-
-                JOptionPane.showMessageDialog(AuthorizationWindow.this, serverPacket.getMessage());
+                client.sendRequest(com.executeOnClient(client.getAuthorized(), user, null));
             }
         });
+    }
+
+    private void localizeInterface(ResourceBundle bundle) {
+        logInButton.setText((String) bundle.getObject("loginButton"));
+        registerButton.setText((String) bundle.getObject("registerButton"));
+        passwordLabel.setText((String) bundle.getObject("passwordLabel"));
+        loginLabel.setText((String) bundle.getObject("loginLabel"));
     }
 }

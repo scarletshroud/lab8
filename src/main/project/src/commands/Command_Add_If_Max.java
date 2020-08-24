@@ -49,9 +49,9 @@ public class Command_Add_If_Max extends Command implements Serializable {
     }
 
     @Override
-    public Packet executeOnClient(boolean authorized, User user, String ... args) {
+    public Packet executeOnClient(boolean authorized, User user, Object args) {
         if (authorized) {
-            Product product = buildProduct(args);
+            Product product = (Product) args;
             if (product != null) {
                 System.out.println("Ready to add element to collection!");
             } else {

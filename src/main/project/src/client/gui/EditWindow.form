@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="src.client.gui.AddWindow">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="src.client.gui.EditWindow">
   <grid id="27dc6" binding="main" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-    <margin top="5" left="5" bottom="5" right="5"/>
+    <margin top="3" left="3" bottom="3" right="3"/>
     <constraints>
-      <xy x="20" y="20" width="543" height="543"/>
+      <xy x="20" y="20" width="448" height="503"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
-      <grid id="18d46" binding="enterLabel" layout-manager="GridLayoutManager" row-count="13" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="5cc8e" layout-manager="GridLayoutManager" row-count="13" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -16,7 +16,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="61378" class="javax.swing.JTextField" binding="nameField">
+          <component id="a867d" class="javax.swing.JTextField" binding="nameField">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -24,7 +24,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="f464b" class="javax.swing.JTextField" binding="locationZField">
+          <component id="25fa9" class="javax.swing.JTextField" binding="locationZField">
             <constraints>
               <grid row="12" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -32,7 +32,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="7eb53" class="javax.swing.JTextField" binding="locationYField">
+          <component id="ebd23" class="javax.swing.JTextField" binding="locationYField">
             <constraints>
               <grid row="11" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -40,7 +40,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="e296f" class="javax.swing.JTextField" binding="coordinateXField">
+          <component id="6bc39" class="javax.swing.JTextField" binding="coordinateXField">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -48,7 +48,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="7cb7e" class="javax.swing.JTextField" binding="locationNameField">
+          <component id="64986" class="javax.swing.JTextField" binding="locationNameField">
             <constraints>
               <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -56,7 +56,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="21fbb" class="javax.swing.JTextField" binding="locationXField">
+          <component id="66846" class="javax.swing.JTextField" binding="locationXField">
             <constraints>
               <grid row="10" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -64,7 +64,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="3802d" class="javax.swing.JTextField" binding="coordinateYField">
+          <component id="432f4" class="javax.swing.JTextField" binding="coordinateYField">
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -74,7 +74,7 @@
               <text value=""/>
             </properties>
           </component>
-          <component id="6213d" class="javax.swing.JTextField" binding="personHeightField">
+          <component id="4a9f9" class="javax.swing.JTextField" binding="personHeightField">
             <constraints>
               <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -82,7 +82,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="a967e" class="javax.swing.JTextField" binding="personNameField">
+          <component id="be77f" class="javax.swing.JTextField" binding="personNameField">
             <constraints>
               <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -90,7 +90,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="81e43" class="javax.swing.JTextField" binding="priceField">
+          <component id="c445d" class="javax.swing.JTextField" binding="priceField">
             <constraints>
               <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -98,7 +98,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="5f6ec" class="javax.swing.JTextField" binding="partNumberField">
+          <component id="4ed7f" class="javax.swing.JTextField" binding="partNumberField">
             <constraints>
               <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -106,7 +106,7 @@
             </constraints>
             <properties/>
           </component>
-          <component id="a5caf" class="javax.swing.JLabel" binding="nameLabel">
+          <component id="2c68d" class="javax.swing.JLabel" binding="nameLabel">
             <constraints>
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -114,7 +114,7 @@
               <text value="Name"/>
             </properties>
           </component>
-          <component id="8b823" class="javax.swing.JLabel" binding="coordinateXLabel">
+          <component id="4dcb7" class="javax.swing.JLabel" binding="coordinateXLabel">
             <constraints>
               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -122,7 +122,7 @@
               <text value="Coordinate X"/>
             </properties>
           </component>
-          <component id="42199" class="javax.swing.JLabel" binding="coordinateYLabel">
+          <component id="692df" class="javax.swing.JLabel" binding="coordinateYLabel">
             <constraints>
               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -130,7 +130,7 @@
               <text value="Coordinate Y"/>
             </properties>
           </component>
-          <component id="49ca2" class="javax.swing.JLabel" binding="priceLabel">
+          <component id="6adeb" class="javax.swing.JLabel" binding="priceLabel">
             <constraints>
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -138,7 +138,7 @@
               <text value="Price"/>
             </properties>
           </component>
-          <component id="e5857" class="javax.swing.JLabel" binding="partNumberLabel">
+          <component id="9ed1f" class="javax.swing.JLabel" binding="partNumberLabel">
             <constraints>
               <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -146,7 +146,7 @@
               <text value="Part Number"/>
             </properties>
           </component>
-          <component id="7783c" class="javax.swing.JLabel" binding="unitOfMeasureLabel">
+          <component id="fab67" class="javax.swing.JLabel" binding="unitOfMeasureLabel">
             <constraints>
               <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -154,7 +154,7 @@
               <text value="Unit of Measure"/>
             </properties>
           </component>
-          <component id="9ff16" class="javax.swing.JLabel" binding="personNameLabel">
+          <component id="9495b" class="javax.swing.JLabel" binding="personNameLabel">
             <constraints>
               <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -162,7 +162,7 @@
               <text value="Person's Name"/>
             </properties>
           </component>
-          <component id="aeaca" class="javax.swing.JLabel" binding="personHeightLabel">
+          <component id="f4b6b" class="javax.swing.JLabel" binding="personHeightLabel">
             <constraints>
               <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -170,7 +170,7 @@
               <text value="Person's Height"/>
             </properties>
           </component>
-          <component id="fb543" class="javax.swing.JLabel" binding="personEyeColorLabel">
+          <component id="294ae" class="javax.swing.JLabel" binding="personEyeColorLabel">
             <constraints>
               <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -178,7 +178,7 @@
               <text value="Person's Eye Color"/>
             </properties>
           </component>
-          <component id="de91d" class="javax.swing.JLabel" binding="locationXLabel">
+          <component id="8f398" class="javax.swing.JLabel" binding="locationXLabel">
             <constraints>
               <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -186,7 +186,7 @@
               <text value="Location X"/>
             </properties>
           </component>
-          <component id="76576" class="javax.swing.JLabel" binding="locationYLabel">
+          <component id="25a83" class="javax.swing.JLabel" binding="locationYLabel">
             <constraints>
               <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -194,7 +194,7 @@
               <text value="Location Y"/>
             </properties>
           </component>
-          <component id="9ac5b" class="javax.swing.JLabel" binding="locationZLabel">
+          <component id="9459c" class="javax.swing.JLabel" binding="locationZLabel">
             <constraints>
               <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -202,7 +202,7 @@
               <text value="Location Z"/>
             </properties>
           </component>
-          <component id="c447d" class="javax.swing.JLabel" binding="locationNameLabel">
+          <component id="bcf17" class="javax.swing.JLabel" binding="locationNameLabel">
             <constraints>
               <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
@@ -210,23 +210,35 @@
               <text value="Location's Name"/>
             </properties>
           </component>
-          <component id="58727" class="javax.swing.JComboBox" binding="measureBox">
+          <component id="795af" class="javax.swing.JComboBox" binding="measureBox">
             <constraints>
               <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <model/>
+              <model>
+                <item value="PCS"/>
+                <item value="MILLILITERS"/>
+                <item value="GRAMS"/>
+              </model>
             </properties>
           </component>
-          <component id="2abbe" class="javax.swing.JComboBox" binding="colorBox">
+          <component id="c7fa5" class="javax.swing.JComboBox" binding="colorBox">
             <constraints>
               <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties/>
+            <properties>
+              <model>
+                <item value="RED"/>
+                <item value="BLUE"/>
+                <item value="ORANGE"/>
+                <item value="WHITE"/>
+                <item value="BROWN"/>
+              </model>
+            </properties>
           </component>
         </children>
       </grid>
-      <grid id="d34f9" layout-manager="GridLayoutManager" row-count="1" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="e3f6f" layout-manager="GridLayoutManager" row-count="1" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -234,48 +246,29 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="b45f7" class="javax.swing.JRadioButton" binding="addRadioButton" default-binding="true">
+          <component id="38569" class="javax.swing.JButton" binding="cancelButton" default-binding="true">
             <constraints>
-              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <selected value="true"/>
-              <text value="Add"/>
+              <text value="Cancel"/>
             </properties>
           </component>
-          <component id="1249e" class="javax.swing.JRadioButton" binding="addIfMaxRadioButton" default-binding="true">
+          <component id="fa84a" class="javax.swing.JButton" binding="applyButton" default-binding="true">
             <constraints>
-              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Add If Max"/>
-            </properties>
-          </component>
-          <component id="45e5b" class="javax.swing.JRadioButton" binding="addIfMinRadioButton" default-binding="true">
-            <constraints>
-              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="Add If Min"/>
-            </properties>
-          </component>
-          <component id="3f0b1" class="javax.swing.JButton" binding="applyButton" default-binding="true">
-            <constraints>
-              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text value="Apply"/>
             </properties>
           </component>
+          <hspacer id="faec2">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </hspacer>
         </children>
       </grid>
     </children>
   </grid>
-  <buttonGroups>
-    <group name="addButtons">
-      <member id="b45f7"/>
-      <member id="1249e"/>
-      <member id="45e5b"/>
-    </group>
-  </buttonGroups>
 </form>

@@ -25,15 +25,21 @@ import java.util.stream.Collectors;
 public class CollectionManager {
 
     private static final Logger logger = LoggerFactory.getLogger(Server.class);
+
     private TreeSet<Product> products;
+    private HashMap<String, java.awt.Color> usersColors;
+
     private DBManager dbManager;
     private LocalDateTime creationDate;
     private DefaultQueue history;
     private Scanner scanner;
+
     private boolean exit = false;
     private boolean hasChanges = false;
 
     private ReadWriteLock lock;
+
+    private final int MAX_COLOR_CODE = 255;
 
     private static int freeId;
 
@@ -44,12 +50,13 @@ public class CollectionManager {
     public CollectionManager(DBManager dbManager) {
 
         products = new TreeSet<>();
+        usersColors = new HashMap<>();
         creationDate = LocalDateTime.now();
         history = new DefaultQueue(11);
         scanner = new Scanner(System.in);
         this.dbManager = dbManager;
         products.addAll(dbManager.readAllProducts());
-
+        defineUserColors();
         lock = new ReentrantReadWriteLock();
     }
 
@@ -102,6 +109,22 @@ public class CollectionManager {
      * Adds a new element to collection
      */
 
+    private void defineUserColors() {
+        for (Product product : products) {
+            if (usersColors.get(product.getHost()) == null) {
+                usersColors.put(product.getHost(), new java.awt.Color((int) (Math.random() * MAX_COLOR_CODE), (int) (Math.random() * MAX_COLOR_CODE), (int) (Math.random() * MAX_COLOR_CODE)));
+            }
+            product.setColor(usersColors.get(product.getHost()));
+        }
+    }
+
+    private void defineUserColors(Product product) {
+        if (usersColors.get(product.getHost()) == null) {
+            usersColors.put(product.getHost(), new java.awt.Color((int) (Math.random() * MAX_COLOR_CODE), (int) (Math.random() * MAX_COLOR_CODE), (int) (Math.random() * MAX_COLOR_CODE)));
+        }
+        product.setColor(usersColors.get(product.getHost()));
+    }
+
     public String add(Object object) {
         lock.writeLock().lock();
         Product product = (Product) object;
@@ -110,6 +133,7 @@ public class CollectionManager {
         if (id  != -1) {
             product.setId(id);
             products.add(product);
+            defineUserColors(product);
             lock.writeLock().unlock();
             hasChanges = true;
             return "Product was successfully added to the collection.\n";
@@ -132,6 +156,7 @@ public class CollectionManager {
             int id = dbManager.createProduct(product);
             if (id != -1) {
                 products.add(product);
+                defineUserColors(product);
                 lock.writeLock().unlock();
                 hasChanges = true;
                 return "Product was successfully added to the collection.\n";
@@ -157,6 +182,7 @@ public class CollectionManager {
             int id = dbManager.createProduct(product);
             if (id != -1) {
                 products.add(product);
+                defineUserColors(product);
                 hasChanges = true;
                 lock.writeLock().unlock();
                 return "Product was successfully added to the collection.\n";
@@ -176,8 +202,16 @@ public class CollectionManager {
     public String clear(User user) {
         lock.writeLock().lock();
 
+        ArrayList<Product> productsToRemove = new ArrayList<>();
         for (Product p : products) {
             if (p.getHost().equals(user.getLogin())) {
+                productsToRemove.add(p);
+
+            }
+        }
+
+        for (Product p : productsToRemove) {
+            if (products.contains(p)) {
                 products.remove(p);
                 dbManager.deleteProduct(p.getId());
             }
@@ -255,7 +289,7 @@ public class CollectionManager {
 
     public String history() {
         lock.readLock().lock();
-        String result = "The history of your last used src.commands:\n";
+        String result = "The history of your last used commands:\n";
         for(int i = 0; i < history.getSize(); i++) {
             result += history.getElement(i) + "\n";
         }
@@ -276,7 +310,7 @@ public class CollectionManager {
             String treeSetType = treeSetField.getGenericType().getTypeName();
             if (!products.isEmpty()) {
                 lock.readLock().unlock();
-                return "Type: " + products.getClass().getName() + "<" + treeSetType + ">" + "\nCreation Date" + creationDate + "\nSize: " + products.size() + "\n";
+                return "Тип: " + products.getClass().getName() + "<" + treeSetType + ">" + "\nДата Создания" + creationDate + "\nРазмер: " + products.size() + "\n";
             } else {
                 lock.readLock().unlock();
                 return "Type can not be defined because collection is empty! " + "\nCreation Date" + creationDate + "\nSize: " + products.size() + "\n";
@@ -385,21 +419,15 @@ public class CollectionManager {
 
     public String updateId(User user, Object object) {
         lock.writeLock().lock();
-        Object[] objects = (Object[]) object;
-        Integer id = (Integer) objects[0];
-        String name = (String) objects[1];
+        Product product = (Product) object;
 
         modifyHistory("update_id");
 
         for (Product p : products) {
-            if (p.getName().equals(name) &&  !isIdBusy(id)) {
+            if (p.getId() == product.getId()) {
                 if (p.getHost().equals(user.getLogin())) {
-                    p.setId(id);
-
-                    Product product = new Product();
-                    product.setId(id);
-                    product.setName(name);
-
+                    products.remove(p);
+                    products.add(product);
                     dbManager.updateProduct(product);
                     hasChanges = true;
                     lock.writeLock().unlock();

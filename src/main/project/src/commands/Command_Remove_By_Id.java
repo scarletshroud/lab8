@@ -41,10 +41,9 @@ public class Command_Remove_By_Id extends Command implements Serializable {
     }
 
     @Override
-    public Packet executeOnClient(boolean authorized, User user, String ... args) {
+    public Packet executeOnClient(boolean authorized, User user, Object args) {
         if (authorized) {
-            Integer id = Integer.parseInt(args[0]);
-            return new Packet(this, user, id);
+            return new Packet(this, user, args);
         }
         System.out.println("You must be logged in to continue working.");
         return null;

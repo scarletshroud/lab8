@@ -3,6 +3,7 @@ package src.elements;
 import com.sun.istack.internal.NotNull;
 
 import javax.xml.bind.ValidationException;
+import java.awt.Color;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,6 +30,8 @@ public class Product implements Comparable<Product>, Serializable {
     private Person owner;
     @NotNull
     private String host;
+
+    private Color color;
 
     /**
      * Constructor
@@ -69,12 +72,15 @@ public class Product implements Comparable<Product>, Serializable {
         this.price = price;
         this.partNumber = partNumber;
 
+
         if (unitOfMeasure.equals("PCS")) {
             this.unitOfMeasure = UnitOfMeasure.PCS;
         } else if (unitOfMeasure.equals("GRAMS")) {
             this.unitOfMeasure = UnitOfMeasure.GRAMS;
         } else if (unitOfMeasure.equals("MILLILITERS")) {
             this.unitOfMeasure = UnitOfMeasure.MILLILITERS;
+        } else {
+            this.unitOfMeasure = UnitOfMeasure.PCS;
         }
 
         this.owner = owner;
@@ -156,6 +162,13 @@ public class Product implements Comparable<Product>, Serializable {
         this.host = name;
     }
 
+    public void setColor(Color color) {
+        if (color == null) {
+            throw new NullPointerException("The variable color is null");
+        }
+        this.color = color;
+    }
+
     public int getId() {return id;}
     public String getName() {return name;}
     public Coordinates getCoordinates() {return coordinates;}
@@ -165,6 +178,7 @@ public class Product implements Comparable<Product>, Serializable {
     public UnitOfMeasure getUnitOfMeasure() {return unitOfMeasure;}
     public Person getOwner() {return owner;}
     public String getHost() {return host;}
+    public Color getColor() {return color;}
 
     /**
      * Method which compares coordinates with each other.

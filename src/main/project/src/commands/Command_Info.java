@@ -35,7 +35,7 @@ public class Command_Info extends Command implements Serializable {
     @Override
     public ServerPacket executeOnServer(Server server, User user, Object object) {
         if (server.checkUser(user.getLogin(), user.getPassword())) {
-            return new ServerPacket(null, server.getCollectionManager().info(), true, false);
+            return new ServerPacket(null, server.getCollectionManager().info(), true, true);
         }
         return new ServerPacket(null, "You don't have rights to interact with collection!", false, true);
     }

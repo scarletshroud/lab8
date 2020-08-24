@@ -2,7 +2,7 @@
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="src.client.gui.AuthorizationWindow">
   <grid id="27dc6" binding="main" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
     <constraints>
-      <xy x="20" y="20" width="271" height="134"/>
+      <xy x="20" y="20" width="271" height="138"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -63,7 +63,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="9f084" class="javax.swing.JLabel">
+              <component id="9f084" class="javax.swing.JLabel" binding="loginLabel">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -81,7 +81,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="913a8" class="javax.swing.JLabel">
+              <component id="913a8" class="javax.swing.JLabel" binding="passwordLabel">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>

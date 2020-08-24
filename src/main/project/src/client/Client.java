@@ -4,6 +4,7 @@ import com.sun.istack.internal.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import src.client.gui.AuthorizationWindow;
+import src.client.gui.Localizer;
 import src.database.User;
 import src.exceptions.InvalidCommand;
 import src.logic.CommandHandler;
@@ -25,8 +26,6 @@ public class Client implements Runnable {
     private DataInputStream ois;
     private DataOutputStream oos;
 
-    private static AuthorizationWindow authorizationWindow;
-
     private final String host;
     private final int port;
 
@@ -47,17 +46,6 @@ public class Client implements Runnable {
 
         commandHandler = new CommandHandler();
         user = new User();
-    }
-
-    public static void main(String[] args) {
-        Client client = new Client("localhost", 29666);
-        client.run();
-        try {
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-        } catch (Exception e) {
-            System.err.println("Look and feel not set.");
-        }
-        authorizationWindow = new AuthorizationWindow(client);
     }
 
     @Override
@@ -176,7 +164,7 @@ public class Client implements Runnable {
         commandHandler.register("info", new Command_Info());
         commandHandler.register("show", new Command_Show());
         commandHandler.register("add", new Command_Add());
-        commandHandler.register("update_id", new Command_Update_Id());
+        commandHandler.register("update_id", new Command_Update_By_Id());
         commandHandler.register("remove_by_id", new Command_Remove_By_Id());
         commandHandler.register("clear", new Command_Clear());
         commandHandler.register("execute_script", new Command_Execute_Script(commandHandler));
@@ -199,6 +187,10 @@ public class Client implements Runnable {
 
     public User getUser() {
         return user;
+    }
+
+    public CommandHandler getCommandHandler() {
+        return commandHandler;
     }
 
     public DataInputStream getDataInputStream() {

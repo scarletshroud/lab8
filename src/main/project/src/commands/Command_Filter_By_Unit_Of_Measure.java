@@ -42,9 +42,9 @@ public class Command_Filter_By_Unit_Of_Measure extends Command implements Serial
     }
 
     @Override
-    public Packet executeOnClient(boolean authorized, User user, String ... args) {
+    public Packet executeOnClient(boolean authorized, User user, Object args) {
         if (authorized) {
-            return new Packet(this, user, args[0]);
+            return new Packet(this, user, args);
         }
         System.out.println("You must be logged in to continue working.");
         return null;

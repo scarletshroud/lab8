@@ -33,7 +33,7 @@ public class Command_Login extends Command implements Serializable {
     }
 
     @Override
-    public Packet executeOnClient(boolean authorized, User user, String ... args) {
+    public Packet executeOnClient(boolean authorized, User user, Object args) {
         Packet packet = new Packet();
         user.setPassword(inputToHash(user.getPassword()));
         packet.wrap(this, user, null);

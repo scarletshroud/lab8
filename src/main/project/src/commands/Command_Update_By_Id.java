@@ -12,13 +12,13 @@ import java.io.Serializable;
  * This command updates id of chosen element in collection.
  */
 
-public class Command_Update_Id extends Command implements Serializable {
+public class Command_Update_By_Id extends Command implements Serializable {
 
     /**
      * Constructor
      */
 
-    public Command_Update_Id() {}
+    public Command_Update_By_Id() {}
 
     @Override
     public boolean validateArgs(String ... args) {
@@ -39,13 +39,10 @@ public class Command_Update_Id extends Command implements Serializable {
     }
 
     @Override
-    public Packet executeOnClient(boolean authorized, User user, String ... args) {
+    public Packet executeOnClient(boolean authorized, User user, Object args) {
         if (authorized) {
             try {
-                int id = Integer.parseInt(args[0]);
-                String name = args[1];
-                Object[] argsToSend = new Object[]{id, name};
-                return new Packet(this, user, argsToSend);
+                return new Packet(this, user, args);
             } catch (NumberFormatException ex) {
                 System.out.println("Arguments aren't correct.");
             }

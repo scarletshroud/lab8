@@ -7,14 +7,16 @@ import src.logic.ServerPacket;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ResourceBundle;
 
-public class RemoveWindow extends JFrame{
+public class RemoveWindow extends JFrame {
     private JPanel panel1;
     private JTextField idField;
     private JButton applyButton;
+    private JLabel idLabel;
     private Client client;
 
-    RemoveWindow(Client client) {
+    RemoveWindow(Client client, Localizer localizer) {
 
         this.client = client;
 
@@ -23,6 +25,7 @@ public class RemoveWindow extends JFrame{
         setResizable(false);
         setSize(250, 100);
 
+        localizeInterface(localizer.getBundle());
 
         applyButton.addActionListener(new ActionListener() {
             @Override
@@ -30,9 +33,11 @@ public class RemoveWindow extends JFrame{
                 String id = idField.getText();
                 Command_Remove_By_Id  command_remove_by_id = new Command_Remove_By_Id();
                 client.sendRequest(command_remove_by_id.executeOnClient(client.getAuthorized(), client.getUser(), id));
-                ServerPacket serverPacket = client.acceptAnswer();
-                JOptionPane.showMessageDialog(RemoveWindow.this, serverPacket.getMessage());
             }
         });
+    }
+
+    public void localizeInterface(ResourceBundle bundle) {
+        applyButton.setText((String) bundle.getObject("applyButton"));
     }
 }

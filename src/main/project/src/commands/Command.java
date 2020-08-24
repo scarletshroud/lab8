@@ -15,7 +15,7 @@ public abstract class Command {
 
     public abstract boolean validateArgs(String ... args);
     public abstract ServerPacket executeOnServer(Server server, User user, Object object);
-    public Packet executeOnClient(boolean authorized, User user, String ... args) {
+    public Packet executeOnClient(boolean authorized, User user, Object args) {
         if (authorized) {
             Packet packet = new Packet();
             packet.wrap(this, user);
